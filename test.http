@@ -1,0 +1,31 @@
+### Test Server
+GET http://localhost:3000
+
+### Register User
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Ace",
+  "email": "john.ace@example.com",
+  "password": "password123"
+}
+
+### Login User
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.ace@example.com",
+  "password": "password123"
+}
+
+### Register with Short Password (Should Fail)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "123"
+}
