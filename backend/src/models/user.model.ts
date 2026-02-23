@@ -1,7 +1,10 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
+import { IUser } from "../types/user";
 dotenv.config();
+
+interface IUserDocument extends Document, IUser {}
 
 // Create a user schema
 const userSchema = new Schema({
@@ -43,6 +46,6 @@ userSchema.methods.comparePassword = async function (enteredPassword: string) {
 };
 
 // Create a Model.
-const User = model("User", userSchema);
+const User = model<IUserDocument>("User", userSchema);
 
 export default User;

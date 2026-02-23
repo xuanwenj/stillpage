@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import bcrypt from "bcrypt";
 import User from "../models/user.model";
+import { IUser } from "../types/user"; 
 export const register = async (
   req: Request,
   res: Response,
@@ -37,7 +37,7 @@ export const login = async (
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-    const isPasswordMatched = await (user as any).comparePassword(password);
+    const isPasswordMatched = await user.comparePassword(password);
     if (!isPasswordMatched) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
