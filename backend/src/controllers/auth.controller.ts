@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../models/user.model";
 import { IUser } from "../types/user";
-import { generateToken } from "../services/auth.service"; 
+import { generateToken } from "../services/auth.service";
 export const register = async (
   req: Request,
   res: Response,
@@ -42,8 +42,11 @@ export const login = async (
     if (!isPasswordMatched) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
+    // generate JWT token
     const { token, expiresIn } = generateToken(user._id.toString(), user.email);
-    res.status(200).json({ message: "Login successful", token, expiresIn, user });
+    res
+      .status(200)
+      .json({ message: "Login successful", token, expiresIn, user });
   } catch (error) {
     return res.status(401).json({
       message: "Error during login",
