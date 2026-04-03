@@ -1,5 +1,6 @@
 import connectMongoose from "../config/db";
 import authRouter from "./routes/auth";
+import noteRouter from "./routes/note";
 import express from "express";
 
 const app = express();
@@ -15,6 +16,7 @@ app.get("/", (req: any, res: any) => {
 
 // Routes
 app.use("/api/auth", authRouter);
+app.use("/api/notes", noteRouter);
 
 // Start server
 const start = async () => {

@@ -1,31 +1,64 @@
-### Test Server
+### Test Server (should return 200)
 GET http://localhost:3000
+
+### ===== AUTHENTICATION =====
 
 ### Register User
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "John Ace",
-  "email": "john.ace@example.com",
+  "name": "Test User",
+  "email": "test@example.com",
   "password": "password123"
 }
 
-### Login User
+### Login User (COPY token from response body)
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "john.ace@example.com",
+  "email": "test@example.com",
   "password": "password123"
 }
 
-### Register with Short Password (Should Fail)
-POST http://localhost:3000/api/auth/register
+### ===== PASTE TOKEN BELOW =====
+### After you run "Login User" above, copy the token value and paste it below
+### Example: @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzUxNzkwMDIsImV4cCI6MTc3NTE4MjYwMn0.2Y-Q2UEfb8rXnFPhrd5Fo7iWBgWNzpBEDfepSYhymHw
+
+### ===== NOTE CRUD TESTS =====
+
+### Create Note
+POST http://localhost:3000/api/notes
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-  "name": "Jane Doe",
-  "email": "jane@example.com",
-  "password": "123"
+  "title": "My First Note",
+  "content": "<h1>Hello World</h1>"
 }
+
+### Get All Notes
+GET http://localhost:3000/api/notes
+Authorization: Bearer {{token}}
+
+### Get Single Note
+GET http://localhost:3000/api/notes/69cf159a9a5d25c36f0d0c1f
+Authorization: Bearer {{token}}
+
+### Update Note
+PUT http://localhost:3000/api/notes/69cf159a9a5d25c36f0d0c1f
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Updated Title",
+  "content": "<p>Updated</p>"
+}
+
+### Delete Note
+DELETE http://localhost:3000/api/notes/REPLACE_WITH_NOTE_ID
+Authorization: Bearer {{token}}
+
