@@ -3,11 +3,18 @@ import authRouter from "./routes/auth";
 import noteRouter from "./routes/note";
 import folderRouter from "./routes/folder";
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const PORT = 3000;
 
 // Middleware
+app.use(
+  cors({
+    origin: "http://localhost:2000",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 // Test route

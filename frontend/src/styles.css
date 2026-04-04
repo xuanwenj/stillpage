@@ -1,0 +1,245 @@
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background-color: #1f1f1f;
+  color: rgba(255, 255, 255, 0.87);
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+/* Login/Register Page */
+.auth-container {
+  min-height: 100vh;
+  background-color: #1f1f1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: #2a2a2a;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  border: 1px solid #404040;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+  color: #a0a0a0;
+  font-size: 0.875rem;
+}
+
+/* Tabs */
+.auth-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #404040;
+  padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: #808080;
+  font-weight: 500;
+  cursor: pointer;
+  padding-bottom: 0.5rem;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  color: #60a5fa;
+  border-bottom: 2px solid #60a5fa;
+}
+
+.tab-btn:hover {
+  color: #a0a0a0;
+}
+
+/* Form groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  color: #d0d0d0;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  background-color: #3a3a3a;
+  border: 1px solid #4a4a4a;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input::placeholder {
+  color: #808080;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #60a5fa;
+}
+
+/* Forgot password link */
+.forgot-password {
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+.forgot-password a {
+  color: #60a5fa;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s;
+}
+
+.forgot-password a:hover {
+  color: #93c5fd;
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  background-color: #60a5fa;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #3b82f6;
+}
+
+.submit-btn:disabled {
+  background-color: #4a5a6a;
+  cursor: not-allowed;
+}
+
+/* Divider */
+.divider {
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #606060;
+  font-size: 0.875rem;
+}
+
+/* Google button */
+.google-btn {
+  width: 100%;
+  background-color: #3a3a3a;
+  color: #d0d0d0;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.google-btn:hover {
+  background-color: #4a4a4a;
+}
+
+/* Error message */
+.error-message {
+  background-color: #7f1d1d;
+  border: 1px solid #b91c1c;
+  color: #fecaca;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+/* Dashboard */
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #1f1f1f;
+  padding: 2rem;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: white;
+}
+
+.dashboard-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-header-right span {
+  color: #d0d0d0;
+}
+
+.logout-btn {
+  background-color: #4a4a4a;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #5a5a5a;
+}
+
+/* Link styling */
+a {
+  text-decoration: none;
+}
+
+a:active,
+a:visited {
+  color: #60a5fa;
+}

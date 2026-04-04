@@ -78,7 +78,7 @@ GET http://localhost:3000/api/folders
 Authorization: Bearer {{token}}
 
 ### Rename Folder (replace REPLACE_WITH_FOLDER_ID with _id from create response)
-PUT http://localhost:3000/api/folders/REPLACE_WITH_FOLDER_ID
+PUT http://localhost:3000/api/folders/69d04b8b282d2983f8aa3075
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
