@@ -26,7 +26,7 @@ Content-Type: application/json
 ### After you run "Login User" above, copy the token value and paste it below
 ### Example: @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzUxNzkwMDIsImV4cCI6MTc3NTE4MjYwMn0.2Y-Q2UEfb8rXnFPhrd5Fo7iWBgWNzpBEDfepSYhymHw
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzUyNTg0NzQsImV4cCI6MTc3NTI2MjA3NH0.zgu7GTuaSNtmeObCHtu0SlEhTzOWiFGqvW832TxYi1o
 
 ### ===== NOTE CRUD TESTS =====
 
@@ -62,3 +62,30 @@ Authorization: Bearer {{token}}
 DELETE http://localhost:3000/api/notes/REPLACE_WITH_NOTE_ID
 Authorization: Bearer {{token}}
 
+### ===== FOLDER CRUD TESTS =====
+
+### Create Folder
+POST http://localhost:3000/api/folders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Work Notes"
+}
+
+### Get All Folders
+GET http://localhost:3000/api/folders
+Authorization: Bearer {{token}}
+
+### Rename Folder (replace REPLACE_WITH_FOLDER_ID with _id from create response)
+PUT http://localhost:3000/api/folders/REPLACE_WITH_FOLDER_ID
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Personal Notes"
+}
+
+### Delete Folder
+DELETE http://localhost:3000/api/folders/REPLACE_WITH_FOLDER_ID
+Authorization: Bearer {{token}}
