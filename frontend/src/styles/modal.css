@@ -1,0 +1,186 @@
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #1f1f1f;
+  border: 1px solid #2a2a2a;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.modal-header h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #a0a0a0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background-color: #2a2a2a;
+  color: white;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-error {
+  background-color: #7f1d1d;
+  border: 1px solid #991b1b;
+  color: #fca5a5;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Input Fields */
+.note-input-title {
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.note-input-title::placeholder {
+  color: #606060;
+}
+
+.note-input-title:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.note-input-title:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.note-input-content {
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  color: white;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: none;
+  flex: 1;
+  min-height: 300px;
+  transition: border-color 0.2s;
+}
+
+.note-input-content::placeholder {
+  color: #606060;
+}
+
+.note-input-content:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.note-input-content:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid #2a2a2a;
+}
+
+/* Modal Buttons */
+.modal-button {
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.375rem;
+  border: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-button-cancel {
+  background-color: #2a2a2a;
+  color: #a0a0a0;
+  border: 1px solid #3a3a3a;
+}
+
+.modal-button-cancel:hover:not(:disabled) {
+  background-color: #3a3a3a;
+  color: #d0d0d0;
+}
+
+.modal-button-save {
+  background-color: #3b82f6;
+  color: white;
+  border: 1px solid #3b82f6;
+}
+
+.modal-button-save:hover:not(:disabled) {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}

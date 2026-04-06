@@ -56,22 +56,40 @@ export const authApi = {
 
 // Note endpoints
 export const noteApi = {
-  getNotes: () => apiClient.get<Note[]>("/notes"),
+  getNotes: async () => {
+    const response = await apiClient.get<{
+      message: string;
+      count: number;
+      notes: Note[];
+    }>("/notes");
+    return { data: response.data.notes };
+  },
 
   getNote: (id: string) => apiClient.get<Note>(`/notes/${id}`),
 
   createNote: (title: string, content: string, folderId?: string) =>
-    apiClient.post<Note>("/notes", { title, content, folderId }),
+    apiClient.post<{ message: string; note: Note }>("/notes", {
+      title,
+      content,
+      folderId,
+    }),
 
   updateNote: (id: string, title: string, content: string, folderId?: string) =>
-    apiClient.put<Note>(`/notes/${id}`, { title, content, folderId }),
+    apiClient.put<{ message: string; note: Note }>(`/notes/${id}`, {
+      title,
+      content,
+      folderId,
+    }),
 
   deleteNote: (id: string) => apiClient.delete(`/notes/${id}`),
 };
 
 // Folder endpoints
 export const folderApi = {
-  getFolders: () => apiClient.get<Folder[]>("/folders"),
+  getFolders: async () => {
+    const response = await apiClient.get<{ folders: Folder[] }>("/folders");
+    return { data: response.data.folders };
+  },
 
   createFolder: (name: string) => apiClient.post<Folder>("/folders", { name }),
 

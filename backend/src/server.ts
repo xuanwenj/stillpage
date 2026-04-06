@@ -11,7 +11,7 @@ const PORT = 3000;
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:2000",
+    origin: ["http://localhost:2000", "http://localhost:2001"],
     credentials: true,
   }),
 );

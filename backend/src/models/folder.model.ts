@@ -30,6 +30,14 @@ const folderSchema = new Schema<IFolder>(
   },
 );
 
+// Virtual for converting _id to id in JSON response
+folderSchema.virtual("id").get(function (this: IFolder) {
+  return this._id;
+});
+
+// Include virtuals when converting to JSON
+folderSchema.set("toJSON", { virtuals: true });
+
 // Create and export the model
 const Folder = model<IFolder>("Folder", folderSchema);
 

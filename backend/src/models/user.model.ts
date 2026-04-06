@@ -45,6 +45,14 @@ userSchema.methods.comparePassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Virtual for converting _id to id in JSON response
+userSchema.virtual("id").get(function (this: IUserDocument) {
+  return this._id;
+});
+
+// Include virtuals when converting to JSON
+userSchema.set("toJSON", { virtuals: true });
+
 // Create a Model.
 const User = model<IUserDocument>("User", userSchema);
 

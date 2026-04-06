@@ -39,8 +39,16 @@ const noteSchema = new Schema<INote>(
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt
-  }
+  },
 );
+
+// Virtual for converting _id to id in JSON response
+noteSchema.virtual("id").get(function (this: INote) {
+  return this._id;
+});
+
+// Include virtuals when converting to JSON
+noteSchema.set("toJSON", { virtuals: true });
 
 // Create and export the model
 const Note = model<INote>("Note", noteSchema);
