@@ -20,6 +20,7 @@ export const DashboardPage = () => {
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
 
   // Fetch notes and folders
   const fetchNotes = async () => {
@@ -54,8 +55,13 @@ export const DashboardPage = () => {
   };
 
   const handleCreateNote = () => {
+    setEditingNote(null);
     setShowModal(true);
-    console.log("Create note clicked");
+  };
+
+  const handleEditNote = (note: Note) => {
+    setEditingNote(note);
+    setShowModal(true);
   };
 
   // Filter notes based on folder and search query
@@ -179,7 +185,12 @@ export const DashboardPage = () => {
             ) : (
               <div className="notes-grid">
                 {filteredNotes.map((note) => (
-                  <div key={note.id} className="note-card">
+                  <div
+                    key={note.id}
+                    className="note-card"
+                    onClick={() => handleEditNote(note)}
+                    style={{ cursor: "pointer" }}
+                  >
                     {/* Title */}
                     <h3 className="note-title">{note.title}</h3>
 
@@ -208,14 +219,16 @@ export const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Create Note Modal */}
+      {/* Create/Edit Note Modal */}
       <CreateNote
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={() => {
           setShowModal(false);
+          setEditingNote(null);
           fetchNotes();
         }}
+        note={editingNote || undefined}
       />
     </div>
   );

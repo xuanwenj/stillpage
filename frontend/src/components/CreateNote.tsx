@@ -1,17 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { noteApi } from "../api/client";
+import type { Note } from "../types";
 
 interface CreateNoteProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
+  note?: Note; // Optional - if provided, we're in edit mode
 }
 
-export const CreateNote = ({ isOpen, onClose, onSave }: CreateNoteProps) => {
+export const CreateNote = ({
+  isOpen,
+  onClose,
+  onSave,
+  note,
+}: CreateNoteProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isEditMode = !!note;
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (isOpen && note) {
+      setTitle(note.title);
+      setContent(note.content);
+    } else if (isOpen) {
+      // Clear form for create mode
+      setTitle("");
+      setContent("");
+    }
+  }, [isOpen, note]);
 
   const handleSave = async () => {
     try {
@@ -23,7 +43,13 @@ export const CreateNote = ({ isOpen, onClose, onSave }: CreateNoteProps) => {
         return;
       }
 
-      await noteApi.createNote(title, content);
+      if (isEditMode && note) {
+        // Edit mode - update existing note
+        await noteApi.updateNote(note.id, title, content);
+      } else {
+        // Create mode - create new note
+        await noteApi.createNote(title, content);
+      }
 
       // Clear form
       setTitle("");
@@ -32,8 +58,8 @@ export const CreateNote = ({ isOpen, onClose, onSave }: CreateNoteProps) => {
       // Call parent callback to refresh notes
       onSave();
     } catch (err) {
-      console.error("Failed to create note:", err);
-      setError("Failed to create note. Please try again.");
+      console.error("Failed to save note:", err);
+      setError("Failed to save note. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +79,7 @@ export const CreateNote = ({ isOpen, onClose, onSave }: CreateNoteProps) => {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="modal-header">
-          <h2>Create New Note</h2>
+          <h2>{isEditMode ? "Edit Note" : "Create New Note"}</h2>
           <button className="modal-close" onClick={handleClose}>
             ✕
           </button>
@@ -95,7 +121,13 @@ export const CreateNote = ({ isOpen, onClose, onSave }: CreateNoteProps) => {
             className="modal-button modal-button-save"
             disabled={isLoading}
           >
-            {isLoading ? "Saving..." : "Save"}
+            {isLoading
+              ? isEditMode
+                ? "Updating..."
+                : "Saving..."
+              : isEditMode
+                ? "Update"
+                : "Save"}
           </button>
         </div>
       </div>
