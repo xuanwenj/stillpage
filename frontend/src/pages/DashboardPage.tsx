@@ -21,6 +21,7 @@ export const DashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const [openMenuNoteId, setOpenMenuNoteId] = useState<string | null>(null);
 
   // Fetch notes and folders
   const fetchNotes = async () => {
@@ -59,9 +60,29 @@ export const DashboardPage = () => {
     setShowModal(true);
   };
 
+  const handleDeleteNote = async (noteId: string) => {
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      try {
+        await noteApi.deleteNote(noteId);
+        setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+      } catch (err) {
+        console.error("Failed to delete note:", err);
+        alert("Failed to delete the note. Please try again.");
+      }
+    }
+  };
   const handleEditNote = (note: Note) => {
     setEditingNote(note);
     setShowModal(true);
+  };
+
+  const handleMenuToggle = (noteId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenMenuNoteId(openMenuNoteId === noteId ? null : noteId);
+  };
+
+  const closeMenu = () => {
+    setOpenMenuNoteId(null);
   };
 
   // Filter notes based on folder and search query
@@ -185,14 +206,53 @@ export const DashboardPage = () => {
             ) : (
               <div className="notes-grid">
                 {filteredNotes.map((note) => (
-                  <div
-                    key={note.id}
-                    className="note-card"
-                    onClick={() => handleEditNote(note)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    {/* Title */}
-                    <h3 className="note-title">{note.title}</h3>
+                  <div key={note.id} className="note-card">
+                    {/* Header with Title and Menu */}
+                    <div className="note-card-header">
+                      <h3 className="note-title">{note.title}</h3>
+                      <div className="note-menu-container">
+                        <button
+                          className="note-menu-btn"
+                          onClick={(e) => handleMenuToggle(note.id, e)}
+                        >
+                          ⋮
+                        </button>
+                        {/* Dropdown Menu */}
+                        {openMenuNoteId === note.id && (
+                          <div className="note-menu-dropdown">
+                            <button
+                              className="menu-item edit-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditNote(note);
+                                closeMenu();
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="menu-item duplicate-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                closeMenu();
+                              }}
+                            >
+                              Duplicate
+                            </button>
+                            <button
+                              className="menu-item delete-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                closeMenu();
+                                handleDeleteNote(note.id);
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
                     {/* Preview */}
                     <p className="note-preview">
