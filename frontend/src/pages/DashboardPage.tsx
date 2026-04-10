@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { noteApi, folderApi } from "../api/client";
 import { CreateNote } from "../components/CreateNote";
+import { CreateFolder } from "../components/CreateFolder";
 import type { Note, Folder } from "../types";
 
 type TabType = "notes" | "todos" | "review";
@@ -22,6 +23,7 @@ export const DashboardPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [openMenuNoteId, setOpenMenuNoteId] = useState<string | null>(null);
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
 
   // Fetch notes and folders
   const fetchNotes = async () => {
@@ -81,6 +83,10 @@ export const DashboardPage = () => {
     setOpenMenuNoteId(openMenuNoteId === noteId ? null : noteId);
   };
 
+  const handleCreateFolder = () => {
+    setShowCreateFolderModal(true);
+  };
+
   const closeMenu = () => {
     setOpenMenuNoteId(null);
   };
@@ -131,7 +137,12 @@ export const DashboardPage = () => {
       <div className="dashboard-content">
         {/* Left Sidebar - Folders */}
         <div className="dashboard-sidebar">
-          <h2 className="sidebar-title">Folders</h2>
+          <div className="sidebar-header">
+            <h2 className="sidebar-title">Folders</h2>
+            <button className="add-folder-btn" onClick={handleCreateFolder}>
+              +
+            </button>
+          </div>
 
           {/* All Notes Folder */}
           <button
@@ -289,6 +300,16 @@ export const DashboardPage = () => {
           fetchNotes();
         }}
         note={editingNote || undefined}
+      />
+
+      {/* Create Folder Modal */}
+      <CreateFolder
+        isOpen={showCreateFolderModal}
+        onClose={() => setShowCreateFolderModal(false)}
+        onSave={() => {
+          setShowCreateFolderModal(false);
+          fetchNotes();
+        }}
       />
     </div>
   );

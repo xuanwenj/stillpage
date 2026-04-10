@@ -51,4 +51,12 @@ noteRouter.put("/:id", authenticate, updateNote);
  */
 noteRouter.delete("/:id", authenticate, deleteNote);
 
+/**
+ * CREATE FOLDER /api/notes/:id/folder
+ * Create a folder for a note
+ * Params: id (note ID)
+ * Body: { name }
+ */
+noteRouter.post("/:id/folder", authenticate);
+
 export default noteRouter;

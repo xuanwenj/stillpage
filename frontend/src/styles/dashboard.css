@@ -72,6 +72,41 @@
   letter-spacing: 0.05em;
 }
 
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+/* Add Folder Button */
+.add-folder-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.35rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.add-folder-btn:hover {
+  background-color: #2563eb;
+}
+
+.add-folder-btn:active {
+  background-color: #1d4ed8;
+}
+
 .folder-btn {
   width: 100%;
   text-align: left;
