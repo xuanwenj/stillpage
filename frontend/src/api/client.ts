@@ -82,6 +82,9 @@ export const noteApi = {
     }),
 
   deleteNote: (id: string) => apiClient.delete(`/notes/${id}`),
+
+  moveNoteToFolder: (noteId: string, folderId: string | null) =>
+    apiClient.put(`/notes/${noteId}`, { folderId }),
 };
 
 // Folder endpoints

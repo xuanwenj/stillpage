@@ -24,6 +24,9 @@ export const DashboardPage = () => {
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [openMenuNoteId, setOpenMenuNoteId] = useState<string | null>(null);
   const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [openSubmenuNoteId, setOpenSubmenuNoteId] = useState<string | null>(
+    null,
+  );
 
   // Fetch notes and folders
   const fetchNotes = async () => {
@@ -87,8 +90,32 @@ export const DashboardPage = () => {
     setShowCreateFolderModal(true);
   };
 
+  const handleMoveNoteToFolder = async (
+    noteId: string,
+    folderId: string | null,
+  ) => {
+    try {
+      await noteApi.moveNoteToFolder(noteId, folderId);
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note.id === noteId ? ({ ...note, folderId } as Note) : note,
+        ),
+      );
+      console.log("Moved note to no folder clicked");
+    } catch (err) {
+      console.error("Failed to move note:", err);
+      alert("Failed to move the note. Please try again.");
+    }
+  };
+
   const closeMenu = () => {
     setOpenMenuNoteId(null);
+    setOpenSubmenuNoteId(null);
+  };
+
+  const handleSubmenuToggle = (noteId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenSubmenuNoteId(openSubmenuNoteId === noteId ? null : noteId);
   };
 
   // Filter notes based on folder and search query
@@ -260,6 +287,50 @@ export const DashboardPage = () => {
                             >
                               Delete
                             </button>
+
+                            <div
+                              className={`menu-submenu ${openSubmenuNoteId === note.id ? "active" : ""}`}
+                            >
+                              <button
+                                className="submenu-label"
+                                onClick={(e) => handleSubmenuToggle(note.id, e)}
+                              >
+                                Move to folder
+                              </button>
+                              {openSubmenuNoteId === note.id && (
+                                <div className="submenu-options">
+                                  {/* "None" option - removes from folder */}
+                                  <button
+                                    className="submenu-item"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleMoveNoteToFolder(note.id, null);
+                                      closeMenu();
+                                    }}
+                                  >
+                                    None
+                                  </button>
+
+                                  {/* Folder options */}
+                                  {folders.map((folder) => (
+                                    <button
+                                      key={folder.id}
+                                      className="submenu-item"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleMoveNoteToFolder(
+                                          note.id,
+                                          folder.id,
+                                        );
+                                        closeMenu();
+                                      }}
+                                    >
+                                      {folder.name}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
