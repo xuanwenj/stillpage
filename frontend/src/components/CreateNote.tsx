@@ -4,6 +4,7 @@ import type { Note } from "../types";
 
 interface CreateNoteProps {
   isOpen: boolean;
+  selectedFolder: string | null;
   onClose: () => void;
   onSave: () => void;
   note?: Note; // Optional - if provided, we're in edit mode
@@ -11,6 +12,7 @@ interface CreateNoteProps {
 
 export const CreateNote = ({
   isOpen,
+  selectedFolder,
   onClose,
   onSave,
   note,
@@ -45,10 +47,10 @@ export const CreateNote = ({
 
       if (isEditMode && note) {
         // Edit mode - update existing note
-        await noteApi.updateNote(note.id, title, content);
+        await noteApi.updateNote(note.id, title, content, selectedFolder);
       } else {
         // Create mode - create new note
-        await noteApi.createNote(title, content);
+        await noteApi.createNote(title, content, selectedFolder);
       }
 
       // Clear form

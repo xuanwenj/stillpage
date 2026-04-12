@@ -364,6 +364,7 @@ export const DashboardPage = () => {
       {/* Create/Edit Note Modal */}
       <CreateNote
         isOpen={showModal}
+        selectedFolder={selectedFolder}
         onClose={() => setShowModal(false)}
         onSave={() => {
           setShowModal(false);
