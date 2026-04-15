@@ -6,6 +6,7 @@ import type {
   User,
   Note,
   Folder,
+  Todo,
 } from "../types";
 
 // Create axios instance with base URL
@@ -104,4 +105,29 @@ export const folderApi = {
   deleteFolder: (id: string) => apiClient.delete(`/folders/${id}`),
 };
 
+// Todo endpoints
+export const todoApi = {
+  getAllTodos: async () => {
+    const response = await apiClient.get<{
+      message: string;
+      count: number;
+      todos: Todo[];
+    }>("/todos");
+    return { data: response.data.todos };
+  },
+
+  createTodo: (content: string, noteId?: string | null) =>
+    apiClient.post<{ message: string; todo: Todo }>("/todos", {
+      content,
+      noteId,
+    }),
+
+  updateTodo: (id: string, content?: string, completed?: boolean) =>
+    apiClient.put<{ message: string; todo: Todo }>(`/todos/${id}`, {
+      content,
+      completed,
+    }),
+
+  deleteTodo: (id: string) => apiClient.delete(`/todos/${id}`),
+};
 export default apiClient;

@@ -2,6 +2,7 @@ import connectMongoose from "../config/db";
 import authRouter from "./routes/auth";
 import noteRouter from "./routes/note";
 import folderRouter from "./routes/folder";
+import todoRouter from "./routes/todo";
 import express from "express";
 import cors from "cors";
 
@@ -26,6 +27,7 @@ app.get("/", (req: any, res: any) => {
 app.use("/api/auth", authRouter);
 app.use("/api/notes", noteRouter);
 app.use("/api/folders", folderRouter);
+app.use("/api/todos", todoRouter);
 
 // Start server
 const start = async () => {

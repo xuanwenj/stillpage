@@ -2,7 +2,7 @@ import { Schema, model, Document, Types } from "mongoose";
 
 // Interface for TypeScript type safety
 interface ITodo extends Document {
-  noteId: Types.ObjectId;
+  noteId?: Types.ObjectId;
   userId: Types.ObjectId;
   content: string;
   completed: boolean;
@@ -17,7 +17,8 @@ const todoSchema = new Schema<ITodo>(
     noteId: {
       type: Schema.Types.ObjectId,
       ref: "Note",
-      required: true,
+      required: false,
+      default: null,
       index: true,
     },
     userId: {

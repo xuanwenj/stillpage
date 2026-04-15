@@ -40,3 +40,14 @@ export type ApiError = {
   message: string;
   status: number;
 };
+
+export type Todo = {
+  id: string;
+  noteId?: string;
+  userId: string;
+  content: string;
+  completed: boolean;
+  archived: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
