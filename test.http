@@ -132,5 +132,5 @@ Authorization: Bearer {{token}}
 }
 
 ### Delete Todo
-DELETE http://localhost:3000/api/todos/REPLACE_WITH_TODO_ID
+DELETE http://localhost:3000/api/todos/69e049ef97070af53706a562
 Authorization: Bearer {{token}}
