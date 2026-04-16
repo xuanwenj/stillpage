@@ -37,11 +37,11 @@ const todoSchema = new Schema<ITodo>(
     completed: {
       type: Boolean,
       default: false,
-      archived: {
-        type: Boolean,
-        default: false,
-        index: true,
-      },
+    },
+    archived: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
   },
   {

@@ -74,8 +74,8 @@ export const deleteTodo = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { todoId } = req.params;
-    const todo = await Todo.findById(todoId);
+    const { id } = req.params;
+    const todo = await Todo.findById(id);
     if (!todo) {
       return res.status(404).json({ message: "Todo item not found" });
     }
@@ -107,10 +107,10 @@ export const updateTodo = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { todoId } = req.params;
+    const { id } = req.params;
     const { content, completed } = req.body;
 
-    const todo = await Todo.findById(todoId);
+    const todo = await Todo.findById(id);
     if (!todo) {
       return res.status(404).json({ message: "Todo item not found" });
     }

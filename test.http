@@ -26,8 +26,7 @@ Content-Type: application/json
 ### After you run "Login User" above, copy the token value and paste it below
 ### Example: @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzUyNTg0NzQsImV4cCI6MTc3NTI2MjA3NH0.zgu7GTuaSNtmeObCHtu0SlEhTzOWiFGqvW832TxYi1o
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzYzMDY2MDUsImV4cCI6MTc3NjMxMDIwNX0.B1Ut3_zqeDYC_wHd3p9d1ARZsn_eCZojVR8Hw-l22eU
 ### ===== NOTE CRUD TESTS =====
 
 ### Create Note
@@ -36,7 +35,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "title": "My First Note",
+  "title": "My Second Note",
   "content": "<h1>Hello World</h1>"
 }
 
@@ -88,4 +87,50 @@ Authorization: Bearer {{token}}
 
 ### Delete Folder
 DELETE http://localhost:3000/api/folders/REPLACE_WITH_FOLDER_ID
+Authorization: Bearer {{token}}
+
+### ===== TODO CRUD TESTS =====
+
+### Create Todo (without note)
+POST http://localhost:3000/api/todos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "Buy groceries"
+}
+
+### Create Todo (with note - replace noteId with actual note ID)
+POST http://localhost:3000/api/todos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "second todo"
+}
+
+### Get All Todos
+GET http://localhost:3000/api/todos
+Authorization: Bearer {{token}}
+
+### Update Todo (mark as completed)
+PUT http://localhost:3000/api/todos/69e049ef97070af53706a562
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "completed": true
+}
+
+### Update Todo (edit content)
+PUT http://localhost:3000/api/todos/69e049ef97070af53706a562
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "Updated todo content"
+}
+
+### Delete Todo
+DELETE http://localhost:3000/api/todos/REPLACE_WITH_TODO_ID
 Authorization: Bearer {{token}}
