@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { noteApi, folderApi } from "../api/client";
+import { noteApi, folderApi, todoApi } from "../api/client";
 import { CreateNote } from "../components/CreateNote";
 import { CreateFolder } from "../components/CreateFolder";
-import type { Note, Folder } from "../types";
+import { CreateTodo } from "../components/CreateTodo";
+import type { Note, Folder, Todo } from "../types";
 
 type TabType = "notes" | "todos" | "review";
+type TodoFilter = "all" | "today" | "completed";
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
@@ -14,11 +16,14 @@ export const DashboardPage = () => {
 
   // State management
   const [notes, setNotes] = useState<Note[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("notes");
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [selectedTodoFilter, setSelectedTodoFilter] =
+    useState<TodoFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
@@ -27,24 +32,25 @@ export const DashboardPage = () => {
   const [openSubmenuNoteId, setOpenSubmenuNoteId] = useState<string | null>(
     null,
   );
+  const [showCreateTodoModal, setShowCreateTodoModal] = useState(false);
 
-  // Fetch notes and folders
-  const fetchNotes = async () => {
+  // Fetch notes, todos and folders
+  const fetchData = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Fetch notes and folders in parallel
-      const [notesResponse, foldersResponse] = await Promise.all([
-        noteApi.getNotes(),
-        folderApi.getFolders(),
-      ]);
+      // Fetch notes, folders, and todos in parallel
+      const [notesResponse, foldersResponse, todosResponse] = await Promise.all(
+        [noteApi.getNotes(), folderApi.getFolders(), todoApi.getAllTodos()],
+      );
 
       setNotes(notesResponse.data);
       setFolders(foldersResponse.data);
+      setTodos(todosResponse.data);
     } catch (err) {
       console.error("Failed to fetch data:", err);
-      setError("Failed to load your notes. Please try again.");
+      setError("Failed to load your data. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +58,7 @@ export const DashboardPage = () => {
 
   // Fetch data on component mount
   useEffect(() => {
-    fetchNotes();
+    fetchData();
   }, []);
 
   const handleLogout = () => {
@@ -113,6 +119,14 @@ export const DashboardPage = () => {
     setOpenSubmenuNoteId(null);
   };
 
+  // Close edit menu when clicking outside
+  useEffect(() => {
+    if (openMenuNoteId === null) return;
+    const handleOutsideClick = () => closeMenu();
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [openMenuNoteId]);
+
   const handleSubmenuToggle = (noteId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setOpenSubmenuNoteId(openSubmenuNoteId === noteId ? null : noteId);
@@ -147,6 +161,51 @@ export const DashboardPage = () => {
     }
   };
 
+  const handleDeleteTodo = async (todoId: string) => {
+    if (window.confirm("Are you sure you want to delete this todo?")) {
+      try {
+        await todoApi.deleteTodo(todoId);
+        setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== todoId));
+      } catch (err) {
+        console.error("Failed to delete todo:", err);
+        alert("Failed to delete the todo. Please try again.");
+      }
+    }
+  };
+
+  const handleCreateTodo = () => {
+    setShowCreateTodoModal(true);
+    console.log("Create todo clicked");
+  };
+
+  const handleCompletedChange = async (todoId: string) => {
+    const todo = todos.find((t) => t.id === todoId);
+    if (!todo) return;
+    const newCompleted = !todo.completed;
+
+    await todoApi.updateTodo(todoId, undefined, newCompleted);
+    setTodos((prevTodos) =>
+      prevTodos.map((t) =>
+        t.id === todoId ? { ...t, completed: newCompleted } : t,
+      ),
+    );
+  };
+  const handleFilteredTodos = todos.filter((todo) => {
+    switch (selectedTodoFilter) {
+      case "all":
+        return true;
+      case "today":
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todoDate = new Date(todo.createdAt);
+        todoDate.setHours(0, 0, 0, 0);
+        return todoDate.getTime() === today.getTime();
+      case "completed":
+        return todo.completed;
+      default:
+        return true;
+    }
+  });
   return (
     <div className="dashboard-wrapper">
       {/* Top Navigation Bar */}
@@ -162,37 +221,90 @@ export const DashboardPage = () => {
 
       {/* Main Content Area */}
       <div className="dashboard-content">
-        {/* Left Sidebar - Folders */}
+        {/* Left Sidebar */}
         <div className="dashboard-sidebar">
-          <div className="sidebar-header">
-            <h2 className="sidebar-title">Folders</h2>
-            <button className="add-folder-btn" onClick={handleCreateFolder}>
-              +
-            </button>
-          </div>
+          {/* Notes Sidebar - Folders */}
+          {activeTab === "notes" && (
+            <>
+              <div className="sidebar-header">
+                <h2 className="sidebar-title">Folders</h2>
+                <button className="add-folder-btn" onClick={handleCreateFolder}>
+                  +
+                </button>
+              </div>
 
-          {/* All Notes Folder */}
-          <button
-            onClick={() => setSelectedFolder(null)}
-            className={`folder-btn ${selectedFolder === null ? "active" : ""}`}
-          >
-            <span>All notes</span>
-            <span className="folder-count">{notes.length}</span>
-          </button>
+              {/* All Notes Folder */}
+              <button
+                onClick={() => setSelectedFolder(null)}
+                className={`folder-btn ${selectedFolder === null ? "active" : ""}`}
+              >
+                <span>All notes</span>
+                <span className="folder-count">{notes.length}</span>
+              </button>
 
-          {/* Folder List */}
-          {folders.map((folder) => (
-            <button
-              key={folder.id}
-              onClick={() => setSelectedFolder(folder.id)}
-              className={`folder-btn ${selectedFolder === folder.id ? "active" : ""}`}
-            >
-              <span>{folder.name}</span>
-              <span className="folder-count">
-                {notes.filter((note) => note.folderId === folder.id).length}
-              </span>
-            </button>
-          ))}
+              {/* Folder List */}
+              {folders.map((folder) => (
+                <button
+                  key={folder.id}
+                  onClick={() => setSelectedFolder(folder.id)}
+                  className={`folder-btn ${selectedFolder === folder.id ? "active" : ""}`}
+                >
+                  <span>{folder.name}</span>
+                  <span className="folder-count">
+                    {notes.filter((note) => note.folderId === folder.id).length}
+                  </span>
+                </button>
+              ))}
+            </>
+          )}
+
+          {/* Todos Sidebar - Filters */}
+          {activeTab === "todos" && (
+            <>
+              <div className="sidebar-header">
+                <h2 className="sidebar-title">Todos</h2>
+              </div>
+
+              {/* All Todos Button */}
+              <button
+                onClick={() => setSelectedTodoFilter("all")}
+                className={`todo-filter-btn ${selectedTodoFilter === "all" ? "active" : ""}`}
+              >
+                <span>All todos</span>
+                <span className="filter-count">{todos.length}</span>
+              </button>
+
+              {/* Today Button */}
+              <button
+                onClick={() => setSelectedTodoFilter("today")}
+                className={`todo-filter-btn ${selectedTodoFilter === "today" ? "active" : ""}`}
+              >
+                <span>Today</span>
+                <span className="filter-count">
+                  {
+                    todos.filter((todo) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const todoDate = new Date(todo.createdAt);
+                      todoDate.setHours(0, 0, 0, 0);
+                      return todoDate.getTime() === today.getTime();
+                    }).length
+                  }
+                </span>
+              </button>
+
+              {/* Completed Button */}
+              <button
+                onClick={() => setSelectedTodoFilter("completed")}
+                className={`todo-filter-btn ${selectedTodoFilter === "completed" ? "active" : ""}`}
+              >
+                <span>Completed</span>
+                <span className="filter-count">
+                  {todos.filter((todo) => todo.completed).length}
+                </span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Right Content Area */}
@@ -227,139 +339,225 @@ export const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Notes Grid */}
-          <div className="notes-container">
-            {isLoading ? (
-              <div className="notes-loading">
-                <p>Loading notes...</p>
-              </div>
-            ) : error ? (
-              <div className="notes-error">
-                <p>{error}</p>
-              </div>
-            ) : filteredNotes.length === 0 ? (
-              <div className="notes-empty">
-                <p>No notes found</p>
-              </div>
-            ) : (
-              <div className="notes-grid">
-                {filteredNotes.map((note) => (
-                  <div key={note.id} className="note-card">
-                    {/* Header with Title and Menu */}
-                    <div className="note-card-header">
-                      <h3 className="note-title">{note.title}</h3>
-                      <div className="note-menu-container">
-                        <button
-                          className="note-menu-btn"
-                          onClick={(e) => handleMenuToggle(note.id, e)}
-                        >
-                          ⋮
-                        </button>
-                        {/* Dropdown Menu */}
-                        {openMenuNoteId === note.id && (
-                          <div className="note-menu-dropdown">
-                            <button
-                              className="menu-item edit-item"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditNote(note);
-                                closeMenu();
-                              }}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="menu-item duplicate-item"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                closeMenu();
-                              }}
-                            >
-                              Duplicate
-                            </button>
-                            <button
-                              className="menu-item delete-item"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                closeMenu();
-                                handleDeleteNote(note.id);
-                              }}
-                            >
-                              Delete
-                            </button>
-
+          {/* Content based on active tab */}
+          {activeTab === "notes" && (
+            <div className="notes-container">
+              {isLoading ? (
+                <div className="notes-loading">
+                  <p>Loading notes...</p>
+                </div>
+              ) : error ? (
+                <div className="notes-error">
+                  <p>{error}</p>
+                </div>
+              ) : filteredNotes.length === 0 ? (
+                <div className="notes-empty">
+                  <p>No notes found</p>
+                </div>
+              ) : (
+                <div className="notes-grid">
+                  {filteredNotes.map((note) => (
+                    <div key={note.id} className="note-card">
+                      {/* Header with Title and Menu */}
+                      <div className="note-card-header">
+                        <h3 className="note-title">{note.title}</h3>
+                        <div className="note-menu-container">
+                          <button
+                            className="note-menu-btn"
+                            onClick={(e) => handleMenuToggle(note.id, e)}
+                          >
+                            ⋮
+                          </button>
+                          {/* Dropdown Menu */}
+                          {openMenuNoteId === note.id && (
                             <div
-                              className={`menu-submenu ${openSubmenuNoteId === note.id ? "active" : ""}`}
+                              className="note-menu-dropdown"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               <button
-                                className="submenu-label"
-                                onClick={(e) => handleSubmenuToggle(note.id, e)}
+                                className="menu-item edit-item"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditNote(note);
+                                  closeMenu();
+                                }}
                               >
-                                Move to folder
+                                Edit
                               </button>
-                              {openSubmenuNoteId === note.id && (
-                                <div className="submenu-options">
-                                  {/* "None" option - removes from folder */}
-                                  <button
-                                    className="submenu-item"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleMoveNoteToFolder(note.id, null);
-                                      closeMenu();
-                                    }}
-                                  >
-                                    None
-                                  </button>
+                              <button
+                                className="menu-item duplicate-item"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  closeMenu();
+                                }}
+                              >
+                                Duplicate
+                              </button>
+                              <button
+                                className="menu-item delete-item"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  closeMenu();
+                                  handleDeleteNote(note.id);
+                                }}
+                              >
+                                Delete
+                              </button>
 
-                                  {/* Folder options */}
-                                  {folders.map((folder) => (
+                              <div
+                                className={`menu-submenu ${openSubmenuNoteId === note.id ? "active" : ""}`}
+                              >
+                                <button
+                                  className="submenu-label"
+                                  onClick={(e) =>
+                                    handleSubmenuToggle(note.id, e)
+                                  }
+                                >
+                                  Move to folder
+                                </button>
+                                {openSubmenuNoteId === note.id && (
+                                  <div className="submenu-options">
+                                    {/* "None" option - removes from folder */}
                                     <button
-                                      key={folder.id}
                                       className="submenu-item"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleMoveNoteToFolder(
-                                          note.id,
-                                          folder.id,
-                                        );
+                                        handleMoveNoteToFolder(note.id, null);
                                         closeMenu();
                                       }}
                                     >
-                                      {folder.name}
+                                      None
                                     </button>
-                                  ))}
-                                </div>
-                              )}
+
+                                    {/* Folder options */}
+                                    {folders.map((folder) => (
+                                      <button
+                                        key={folder.id}
+                                        className="submenu-item"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleMoveNoteToFolder(
+                                            note.id,
+                                            folder.id,
+                                          );
+                                          closeMenu();
+                                        }}
+                                      >
+                                        {folder.name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Preview */}
+                      <p className="note-preview">
+                        {note.content.replace(/<[^>]*>/g, "")}
+                      </p>
+
+                      {/* Footer */}
+                      <div className="note-footer">
+                        <span className="note-date">
+                          {formatDate(note.createdAt)}
+                        </span>
                       </div>
                     </div>
+                  ))}
 
-                    {/* Preview */}
-                    <p className="note-preview">
-                      {note.content.replace(/<[^>]*>/g, "")}
-                    </p>
+                  {/* New Note Button */}
+                  <button
+                    className="new-note-button"
+                    onClick={handleCreateNote}
+                  >
+                    <span className="new-note-text">+ New note</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
-                    {/* Footer */}
-                    <div className="note-footer">
-                      <span className="note-date">
-                        {formatDate(note.createdAt)}
-                      </span>
-                      <span className="note-todos">0 todos</span>
+          {/* Todos View */}
+          {activeTab === "todos" && (
+            <div className="todos-container">
+              {isLoading ? (
+                <div className="todos-loading">
+                  <p>Loading todos...</p>
+                </div>
+              ) : error ? (
+                <div className="todos-error">
+                  <p>{error}</p>
+                </div>
+              ) : handleFilteredTodos.length === 0 ? (
+                <div className="todos-empty">
+                  <p>No todos yet. Create one to get started!</p>
+                </div>
+              ) : (
+                <div className="todos-list">
+                  {handleFilteredTodos.map((todo) => (
+                    <div key={todo.id} className="todo-item">
+                      <div className="todo-content">
+                        <input
+                          type="checkbox"
+                          checked={todo.completed}
+                          onChange={() => {
+                            handleCompletedChange(todo.id);
+                          }}
+                          className="todo-checkbox"
+                        />
+                        <div className="todo-text-wrapper">
+                          <div
+                            className={`todo-title ${todo.completed ? "completed" : ""}`}
+                          >
+                            {todo.content}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="todo-actions">
+                        <span className="todo-date">
+                          {formatDate(todo.createdAt)}
+                        </span>
+                        <button
+                          className="todo-delete-btn"
+                          onClick={() => {
+                            handleDeleteTodo(todo.id);
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
 
-                {/* New Note Button */}
-                <button className="new-note-button" onClick={handleCreateNote}>
-                  <span className="new-note-text">+ New note</span>
-                </button>
-              </div>
-            )}
-          </div>
+              {/* New Todo Button - Fixed at bottom */}
+              <button className="new-todo-button" onClick={handleCreateTodo}>
+                + New todo
+              </button>
+            </div>
+          )}
+
+          {/* Review View */}
+          {activeTab === "review" && (
+            <div className="review-container">
+              <p>Review section coming soon</p>
+            </div>
+          )}
         </div>
       </div>
+      {/* Create todo Modal */}
+      <CreateTodo
+        isOpen={showCreateTodoModal}
+        onClose={() => setShowCreateTodoModal(false)}
+        onSave={() => {
+          setShowCreateTodoModal(false);
+          fetchData();
+        }}
+      />
 
       {/* Create/Edit Note Modal */}
       <CreateNote
@@ -369,7 +567,7 @@ export const DashboardPage = () => {
         onSave={() => {
           setShowModal(false);
           setEditingNote(null);
-          fetchNotes();
+          fetchData();
         }}
         note={editingNote || undefined}
       />
@@ -380,7 +578,7 @@ export const DashboardPage = () => {
         onClose={() => setShowCreateFolderModal(false)}
         onSave={() => {
           setShowCreateFolderModal(false);
-          fetchNotes();
+          fetchData();
         }}
       />
     </div>
