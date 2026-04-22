@@ -25,19 +25,35 @@ export const createNote = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { title, content, folderId } = req.body;
+    const { title, content, folderId, tags } = req.body;
 
     // Validation
     if (!title || title.trim() === "") {
       return res.status(400).json({ message: "Title is required" });
     }
 
+    // Validate tags
+    if (tags !== undefined) {
+      if (!Array.isArray(tags)) {
+        return res.status(400).json({ message: "Tags must be an array" });
+      }
+      if (tags.length > 3) {
+        return res.status(400).json({ message: "Maximum 3 tags allowed" });
+      }
+      if (tags.some((t: unknown) => typeof t !== "string" || t.trim() === "")) {
+        return res
+          .status(400)
+          .json({ message: "Each tag must be a non-empty string" });
+      }
+    }
+
     // Create note
     const note = new Note({
       userId,
       title: title.trim(),
-      content: content || "", // Empty string if no content yet
+      content: content || "",
       folderId: folderId || null,
+      tags: tags ?? [],
     });
 
     await note.save();
@@ -155,7 +171,7 @@ export const updateNote = async (
     }
 
     const { id } = req.params as { id: string };
-    const { title, content, folderId } = req.body;
+    const { title, content, folderId, tags } = req.body;
 
     // Validate ID format
     if (!id || !Types.ObjectId.isValid(id)) {
@@ -184,6 +200,20 @@ export const updateNote = async (
     }
     if (folderId !== undefined) {
       note.folderId = folderId || null;
+    }
+    if (tags !== undefined) {
+      if (!Array.isArray(tags)) {
+        return res.status(400).json({ message: "Tags must be an array" });
+      }
+      if (tags.length > 3) {
+        return res.status(400).json({ message: "Maximum 3 tags allowed" });
+      }
+      if (tags.some((t: unknown) => typeof t !== "string" || t.trim() === "")) {
+        return res
+          .status(400)
+          .json({ message: "Each tag must be a non-empty string" });
+      }
+      note.tags = tags;
     }
 
     await note.save();

@@ -358,6 +358,23 @@
   color: #606060;
 }
 
+.note-tag-pill {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 0.25rem;
+  background-color: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.note-tags {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
 .note-todos {
   background-color: #78350f;
   color: #fcd34d;
@@ -724,9 +741,93 @@
 /* Review Container */
 .review-container {
   flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.review-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.review-section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #606060;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.review-item {
+  background-color: #1f1f1f;
+  border: 1px solid #2a2a2a;
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+
+.review-item:hover {
+  border-color: #3d3d3d;
+}
+
+.review-item-content {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #a0a0a0;
-  font-size: 1.125rem;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.review-item-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.review-tag-note {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.review-tag-todo {
+  background-color: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+}
+
+.review-item-title {
+  font-size: 0.9rem;
+  color: #d0d0d0;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-item-title.completed {
+  text-decoration: line-through;
+  color: #606060;
+}
+
+.review-item-date {
+  font-size: 0.75rem;
+  color: #606060;
+  flex-shrink: 0;
+  margin-left: 1rem;
 }

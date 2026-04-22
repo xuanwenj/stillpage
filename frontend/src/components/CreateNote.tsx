@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, KeyboardEvent } from "react";
 import { noteApi } from "../api/client";
 import type { Note } from "../types";
 
@@ -19,6 +19,8 @@ export const CreateNote = ({
 }: CreateNoteProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isEditMode = !!note;
@@ -28,10 +30,13 @@ export const CreateNote = ({
     if (isOpen && note) {
       setTitle(note.title);
       setContent(note.content);
+      setTags(note.tags ?? []);
+      setTagInput("");
     } else if (isOpen) {
-      // Clear form for create mode
       setTitle("");
       setContent("");
+      setTags([]);
+      setTagInput("");
     }
   }, [isOpen, note]);
 
@@ -46,16 +51,16 @@ export const CreateNote = ({
       }
 
       if (isEditMode && note) {
-        // Edit mode - update existing note
-        await noteApi.updateNote(note.id, title, content, selectedFolder);
+        await noteApi.updateNote(note.id, title, content, selectedFolder, tags);
       } else {
-        // Create mode - create new note
-        await noteApi.createNote(title, content, selectedFolder);
+        await noteApi.createNote(title, content, selectedFolder, tags);
       }
 
       // Clear form
       setTitle("");
       setContent("");
+      setTags([]);
+      setTagInput("");
 
       // Call parent callback to refresh notes
       onSave();
@@ -70,8 +75,35 @@ export const CreateNote = ({
   const handleClose = () => {
     setTitle("");
     setContent("");
+    setTags([]);
+    setTagInput("");
     setError(null);
     onClose();
+  };
+
+  const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const trimmed = tagInput.trim().replace(/,$/, "");
+      if (!trimmed) return;
+      if (tags.length >= 3) {
+        setError("Maximum 3 tags allowed");
+        return;
+      }
+      if (tags.includes(trimmed)) {
+        setTagInput("");
+        return;
+      }
+      setTags([...tags, trimmed]);
+      setTagInput("");
+      setError(null);
+    } else if (e.key === "Backspace" && tagInput === "" && tags.length > 0) {
+      setTags(tags.slice(0, -1));
+    }
+  };
+
+  const removeTag = (index: number) => {
+    setTags(tags.filter((_, i) => i !== index));
   };
 
   if (!isOpen) return null;
@@ -107,6 +139,41 @@ export const CreateNote = ({
             className="note-input-content"
             disabled={isLoading}
           />
+
+          {/* Tag Input */}
+          <div className="tag-selector">
+            <span className="tag-selector-label">Tags (max 3)</span>
+            <div className="tag-input-wrapper">
+              {tags.map((tag, i) => (
+                <span key={i} className="tag-pill tag-pill-active">
+                  {tag}
+                  <button
+                    type="button"
+                    className="tag-pill-remove"
+                    onClick={() => removeTag(i)}
+                    disabled={isLoading}
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+              {tags.length < 3 && (
+                <input
+                  type="text"
+                  className="tag-input"
+                  placeholder={
+                    tags.length === 0
+                      ? "Add a tag, press Enter..."
+                      : "Add another..."
+                  }
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagKeyDown}
+                  disabled={isLoading}
+                />
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Footer */}

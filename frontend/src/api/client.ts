@@ -68,11 +68,17 @@ export const noteApi = {
 
   getNote: (id: string) => apiClient.get<Note>(`/notes/${id}`),
 
-  createNote: (title: string, content: string, folderId?: string | null) =>
+  createNote: (
+    title: string,
+    content: string,
+    folderId?: string,
+    tags?: string[] | null,
+  ) =>
     apiClient.post<{ message: string; note: Note }>("/notes", {
       title,
       content,
       folderId,
+      tags,
     }),
 
   updateNote: (
@@ -80,11 +86,13 @@ export const noteApi = {
     title: string,
     content: string,
     folderId?: string | null,
+    tags?: string[] | null,
   ) =>
     apiClient.put<{ message: string; note: Note }>(`/notes/${id}`, {
       title,
       content,
       folderId,
+      tags,
     }),
 
   deleteNote: (id: string) => apiClient.delete(`/notes/${id}`),

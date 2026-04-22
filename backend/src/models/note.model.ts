@@ -8,6 +8,7 @@ interface INote extends Document {
   folderId?: Types.ObjectId; // Optional - note can exist without folder
   createdAt: Date;
   updatedAt: Date;
+  tags: string[];
 }
 
 // Define the schema
@@ -34,6 +35,11 @@ const noteSchema = new Schema<INote>(
       type: Schema.Types.ObjectId,
       ref: "Folder", // Reference to Folder model
       default: null, // Optional
+      index: true,
+    },
+    tags: {
+      type: [String],
+      default: [],
       index: true,
     },
   },

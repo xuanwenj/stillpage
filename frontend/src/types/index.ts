@@ -24,6 +24,7 @@ export type Note = {
   folderId?: string;
   createdAt: string;
   updatedAt: string;
+  tags?: string[];
 };
 
 // Folder types

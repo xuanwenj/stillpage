@@ -9,6 +9,7 @@ import type { Note, Folder, Todo } from "../types";
 
 type TabType = "notes" | "todos" | "review";
 type TodoFilter = "all" | "today" | "completed";
+type ReviewFilter = "week" | "month";
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,8 @@ export const DashboardPage = () => {
     null,
   );
   const [showCreateTodoModal, setShowCreateTodoModal] = useState(false);
+  const [selectedReviewFilter, setSelectedReviewFilter] =
+    useState<ReviewFilter>("week");
 
   // Fetch notes, todos and folders
   const fetchData = async () => {
@@ -206,6 +209,7 @@ export const DashboardPage = () => {
         return true;
     }
   });
+
   return (
     <div className="dashboard-wrapper">
       {/* Top Navigation Bar */}
@@ -302,6 +306,29 @@ export const DashboardPage = () => {
                 <span className="filter-count">
                   {todos.filter((todo) => todo.completed).length}
                 </span>
+              </button>
+            </>
+          )}
+
+          {/* Review Sidebar - Filters */}
+          {activeTab === "review" && (
+            <>
+              <div className="sidebar-header">
+                <h2 className="sidebar-title">Review</h2>
+              </div>
+
+              <button
+                onClick={() => setSelectedReviewFilter("week")}
+                className={`todo-filter-btn ${selectedReviewFilter === "week" ? "active" : ""}`}
+              >
+                <span>This Week</span>
+              </button>
+
+              <button
+                onClick={() => setSelectedReviewFilter("month")}
+                className={`todo-filter-btn ${selectedReviewFilter === "month" ? "active" : ""}`}
+              >
+                <span>This Month</span>
               </button>
             </>
           )}
@@ -464,6 +491,13 @@ export const DashboardPage = () => {
                         <span className="note-date">
                           {formatDate(note.createdAt)}
                         </span>
+                        <div className="note-tags">
+                          {note.tags?.map((tag) => (
+                            <span key={tag} className="note-tag-pill">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -542,11 +576,7 @@ export const DashboardPage = () => {
           )}
 
           {/* Review View */}
-          {activeTab === "review" && (
-            <div className="review-container">
-              <p>Review section coming soon</p>
-            </div>
-          )}
+          {activeTab === "review" && <div className="review-container"></div>}
         </div>
       </div>
       {/* Create todo Modal */}
