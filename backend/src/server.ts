@@ -3,6 +3,7 @@ import authRouter from "./routes/auth";
 import noteRouter from "./routes/note";
 import folderRouter from "./routes/folder";
 import todoRouter from "./routes/todo";
+import brainDumpRouter from "./routes/braindump";
 import express from "express";
 import cors from "cors";
 
@@ -28,6 +29,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/notes", noteRouter);
 app.use("/api/folders", folderRouter);
 app.use("/api/todos", todoRouter);
+app.use("/api/braindump", brainDumpRouter);
 
 // Start server
 const start = async () => {

@@ -7,6 +7,7 @@ import type {
   Note,
   Folder,
   Todo,
+  BrainDump,
 } from "../types";
 
 // Create axios instance with base URL
@@ -138,4 +139,19 @@ export const todoApi = {
 
   deleteTodo: (id: string) => apiClient.delete(`/todos/${id}`),
 };
+
+// Brain Dump endpoints
+export const brainDumpApi = {
+  get: (date?: string) =>
+    apiClient.get<{ entry: BrainDump | null }>("/braindump", {
+      params: date ? { date } : {},
+    }),
+
+  upsert: (content: string, date?: string) =>
+    apiClient.put<{ entry: BrainDump }>("/braindump", {
+      content,
+      date,
+    }),
+};
+
 export default apiClient;

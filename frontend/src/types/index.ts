@@ -42,6 +42,15 @@ export type ApiError = {
   status: number;
 };
 
+export type BrainDump = {
+  id: string;
+  userId: string;
+  content: string;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type Todo = {
   id: string;
   noteId?: string;
