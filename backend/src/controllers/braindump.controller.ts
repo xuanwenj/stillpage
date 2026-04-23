@@ -47,11 +47,12 @@ export const upsertBrainDump = async (req: AuthRequest, res: Response) => {
     const entry = await BrainDump.findOneAndUpdate(
       { userId: new Types.ObjectId(userId), date: targetDate },
       { content: content ?? "" },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     );
 
     return res.status(200).json({ entry });
   } catch (error) {
+    console.error("upsertBrainDump error:", error);
     return res.status(500).json({ message: "Error saving brain dump" });
   }
 };

@@ -6,6 +6,7 @@ interface INote extends Document {
   title: string;
   content: string; // HTML from Quill
   folderId?: Types.ObjectId; // Optional - note can exist without folder
+  date: string; // YYYY-MM-DD, set on creation
   createdAt: Date;
   updatedAt: Date;
   tags: string[];
@@ -40,6 +41,10 @@ const noteSchema = new Schema<INote>(
     tags: {
       type: [String],
       default: [],
+      index: true,
+    },
+    date: {
+      type: String,
       index: true,
     },
   },

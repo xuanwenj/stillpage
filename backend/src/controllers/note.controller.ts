@@ -54,6 +54,7 @@ export const createNote = async (
       content: content || "",
       folderId: folderId || null,
       tags: tags ?? [],
+      date: new Date().toISOString().slice(0, 10),
     });
 
     await note.save();

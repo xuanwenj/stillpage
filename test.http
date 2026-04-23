@@ -26,7 +26,7 @@ Content-Type: application/json
 ### After you run "Login User" above, copy the token value and paste it below
 ### Example: @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzYzMDY2MDUsImV4cCI6MTc3NjMxMDIwNX0.B1Ut3_zqeDYC_wHd3p9d1ARZsn_eCZojVR8Hw-l22eU
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzY5MTMyMzksImV4cCI6MTc3NjkxNjgzOX0.xlPgpuJ-3bqam27jfgVzpfTNhgpgyzK_JHft4Ld6IrQ
 ### ===== NOTE CRUD TESTS =====
 
 ### Create Note
@@ -133,4 +133,25 @@ Authorization: Bearer {{token}}
 
 ### Delete Todo
 DELETE http://localhost:3000/api/todos/69e049ef97070af53706a562
+Authorization: Bearer {{token}}
+
+### ===== BRAIN DUMP =====
+
+### Save Today's Brain Dump
+PUT http://localhost:3000/api/braindump
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "Need to finish the AI review feature. Also thinking about refactoring the todo list. Keep getting distracted by emails."
+}
+
+### Get Today's Brain Dump
+GET http://localhost:3000/api/braindump
+Authorization: Bearer {{token}}
+
+### ===== AI DAILY REVIEW =====
+
+### Get Today's Daily Review (AI-generated)
+POST http://localhost:3000/api/review/daily
 Authorization: Bearer {{token}}

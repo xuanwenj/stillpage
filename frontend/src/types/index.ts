@@ -22,6 +22,7 @@ export type Note = {
   title: string;
   content: string;
   folderId?: string;
+  date?: string;
   createdAt: string;
   updatedAt: string;
   tags?: string[];
