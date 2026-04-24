@@ -26,7 +26,7 @@ Content-Type: application/json
 ### After you run "Login User" above, copy the token value and paste it below
 ### Example: @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzY5MTMyMzksImV4cCI6MTc3NjkxNjgzOX0.xlPgpuJ-3bqam27jfgVzpfTNhgpgyzK_JHft4Ld6IrQ
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzcwMDc1ODUsImV4cCI6MTc3NzAxMTE4NX0.ZEn1uhqMu0AF8GIlnhsYC0GOkhVQQkNUqC3bXDU6Z9o
 ### ===== NOTE CRUD TESTS =====
 
 ### Create Note
@@ -143,7 +143,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "content": "Need to finish the AI review feature. Also thinking about refactoring the todo list. Keep getting distracted by emails."
+  "content": "Thinking about refactoring todo list. Keep getting distracted by emails."
 }
 
 ### Get Today's Brain Dump

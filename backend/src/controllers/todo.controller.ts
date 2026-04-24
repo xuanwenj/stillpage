@@ -47,6 +47,7 @@ export const createTodo = async (
       noteId,
       userId,
       content: content.trim(),
+      date: new Date().toISOString().slice(0, 10),
     });
 
     await todo.save();

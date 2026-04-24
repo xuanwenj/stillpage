@@ -7,6 +7,7 @@ interface ITodo extends Document {
   content: string;
   completed: boolean;
   archived: boolean;
+  date: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,6 +42,10 @@ const todoSchema = new Schema<ITodo>(
     archived: {
       type: Boolean,
       default: false,
+      index: true,
+    },
+    date: {
+      type: String,
       index: true,
     },
   },

@@ -59,6 +59,7 @@ export type Todo = {
   content: string;
   completed: boolean;
   archived: boolean;
+  date?: string;
   createdAt: string;
   updatedAt: string;
 };

@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { noteApi, folderApi, todoApi, brainDumpApi } from "../api/client";
+import {
+  noteApi,
+  folderApi,
+  todoApi,
+  brainDumpApi,
+  reviewApi,
+} from "../api/client";
 import { CreateNote } from "../components/CreateNote";
 import { CreateFolder } from "../components/CreateFolder";
 import { CreateTodo } from "../components/CreateTodo";
@@ -27,6 +33,8 @@ export const DashboardPage = () => {
   const [brainDump, setBrainDump] = useState<BrainDump | null>(null);
   const [brainDumpContent, setBrainDumpContent] = useState("");
   const [brainDumpSaving, setBrainDumpSaving] = useState(false);
+  const [reviewSummary, setReviewSummary] = useState("");
+  const [reviewLoading, setReviewLoading] = useState(false);
   const [clockTime, setClockTime] = useState(() => {
     const now = new Date();
     return now.toLocaleTimeString("en-US", {
@@ -212,16 +220,24 @@ export const DashboardPage = () => {
     }
   };
 
-  const isToday = (dateString: string) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const d = new Date(dateString);
-    d.setHours(0, 0, 0, 0);
-    return d.getTime() === today.getTime();
+  const handleReview = async () => {
+    setReviewLoading(true);
+    try {
+      const res = await reviewApi.performReview();
+      setReviewSummary(res.data.summary);
+      await fetchData();
+    } catch (err) {
+      console.error("Review error:", err);
+      alert("Failed to perform the review. Please try again.");
+    } finally {
+      setReviewLoading(false);
+    }
   };
 
-  const todayTodos = todos.filter((t) => isToday(t.createdAt));
-  const pendingTodos = todos.filter((t) => !isToday(t.createdAt));
+  const todayString = () => new Date().toISOString().slice(0, 10);
+
+  const todayTodos = todos.filter((t) => t.date === todayString());
+  const pendingTodos = todos.filter((t) => t.date !== todayString());
 
   return (
     <div className="dashboard-wrapper">
@@ -547,9 +563,18 @@ export const DashboardPage = () => {
               <div className="clock-day">{clockDay}</div>
             </div>
 
-            {/* Today's Review — placeholder */}
-            <div className="panel-card">
-              <h2 className="panel-label">Today's Review</h2>
+            {/* Today's Review */}
+            <div className="panel-card review-card">
+              <button
+                className="panel-label review-btn"
+                onClick={handleReview}
+                disabled={reviewLoading}
+              >
+                {reviewLoading ? "Generating..." : "Today's Review"}
+              </button>
+              {reviewSummary && (
+                <p className="review-summary">{reviewSummary}</p>
+              )}
             </div>
           </div>
         </div>

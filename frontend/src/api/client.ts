@@ -154,4 +154,11 @@ export const brainDumpApi = {
     }),
 };
 
+export const reviewApi = {
+  performReview: () =>
+    apiClient.post<{ summary: string; tomorrowSuggestions: string[] }>(
+      "/review/daily",
+    ),
+};
+
 export default apiClient;

@@ -82,8 +82,33 @@ export const getDailyReview = async (req: AuthRequest, res: Response) => {
     if (typeof parsed.summary !== "string") throw new Error("Invalid response");
     if (!Array.isArray(parsed.tomorrowSuggestions))
       throw new Error("Invalid response");
-    const reviewText = `Daily Review:\n${parsed.summary}\n\nTomorrow's Suggestions:\n${parsed.tomorrowSuggestions.map((s: string) => `- ${s}`).join("\n")}`;
-    return res.status(200).json({ review: reviewText });
+
+    const tomorrow = tomorrowString();
+    const userObjectId = new Types.ObjectId(userId);
+
+    // Save AI suggestions as new todos with tomorrow's date
+    if (parsed.tomorrowSuggestions.length > 0) {
+      await Todo.insertMany(
+        parsed.tomorrowSuggestions.map((content: string) => ({
+          userId: userObjectId,
+          content,
+          date: tomorrow,
+          completed: false,
+          archived: false,
+        })),
+      );
+    }
+
+    // Bump today's unfinished todos to tomorrow
+    await Todo.updateMany(
+      { userId: userObjectId, date, completed: false },
+      { date: tomorrow },
+    );
+
+    return res.status(200).json({
+      summary: parsed.summary,
+      tomorrowSuggestions: parsed.tomorrowSuggestions,
+    });
   } catch (error) {
     console.error("getDailyReview error:", error);
     return res.status(500).json({ message: "Error generating review" });
@@ -92,4 +117,10 @@ export const getDailyReview = async (req: AuthRequest, res: Response) => {
 
 function todayString(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function tomorrowString(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
 }
