@@ -82,6 +82,54 @@
   flex-shrink: 0;
 }
 
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1.25rem;
+  gap: 0.25rem;
+}
+
+.sidebar-tab {
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: none;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.sidebar-tab:hover {
+  background-color: var(--surface-2);
+  color: var(--text);
+}
+
+.sidebar-tab.active {
+  background-color: var(--surface-2);
+  color: var(--accent);
+}
+
+.tab-view {
+  grid-template-columns: 1fr;
+  padding: 0;
+}
+
+/* Make review tab use flex instead of grid for full width */
+.dashboard-main.tab-view:has(.wr-layout) {
+  display: block;
+  padding: 0;
+  background: none;
+}
+
 /* ===== THREE-PANEL GRID ===== */
 .dashboard-main {
   flex: 1;

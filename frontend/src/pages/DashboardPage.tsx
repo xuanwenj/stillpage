@@ -11,6 +11,7 @@ import {
 import { CreateNote } from "../components/CreateNote";
 import { CreateFolder } from "../components/CreateFolder";
 import { CreateTodo } from "../components/CreateTodo";
+import { WeekReviewPage } from "./WeekReviewPage";
 import type { Note, Folder, Todo, BrainDump } from "../types";
 
 export const DashboardPage = () => {
@@ -35,6 +36,9 @@ export const DashboardPage = () => {
   const [brainDumpSaving, setBrainDumpSaving] = useState(false);
   const [reviewSummary, setReviewSummary] = useState("");
   const [reviewLoading, setReviewLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"daily" | "notes" | "review">(
+    "daily",
+  );
   const [clockTime, setClockTime] = useState(() => {
     const now = new Date();
     return now.toLocaleTimeString("en-US", {
@@ -237,7 +241,9 @@ export const DashboardPage = () => {
   const todayString = () => new Date().toISOString().slice(0, 10);
 
   const todayTodos = todos.filter((t) => t.date === todayString());
-  const pendingTodos = todos.filter((t) => t.date !== todayString());
+  const pendingTodos = todos.filter(
+    (t) => t.date !== todayString() && !t.completed,
+  );
 
   return (
     <div className="dashboard-wrapper">
@@ -255,329 +261,363 @@ export const DashboardPage = () => {
       {/* Main Content */}
       <div className="dashboard-content">
         {/* Sidebar — reserved for future navigation */}
-        <div className="dashboard-sidebar" />
+        <div className="dashboard-sidebar">
+          <nav className="sidebar-nav">
+            {(["daily", "notes", "review"] as const).map((tab) => (
+              <button
+                key={tab}
+                className={`sidebar-tab ${activeTab === tab ? "active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </nav>
+        </div>
 
         {/* Three-panel grid */}
-        <div className="dashboard-main">
-          {/* Notes + Brain Dump Column */}
-          <div className="notes-column">
-            <div className="panel panel-half">
-              <h2 className="panel-label">NOTES</h2>
-              {isLoading ? (
-                <p className="panel-empty">Loading...</p>
-              ) : error ? (
-                <p className="panel-empty">{error}</p>
-              ) : notes.length === 0 ? (
-                <p className="panel-empty">No notes yet</p>
-              ) : (
-                <div className="notes-list">
-                  {notes.map((note) => (
-                    <div key={note.id} className="note-card">
-                      <div className="note-card-header">
-                        <h3 className="note-title">{note.title}</h3>
-                        <div className="note-menu-container">
-                          <button
-                            className="note-menu-btn"
-                            onClick={(e) => handleMenuToggle(note.id, e)}
-                          >
-                            ⋮
-                          </button>
-                          {openMenuNoteId === note.id && (
-                            <div
-                              className="note-menu-dropdown"
-                              onClick={(e) => e.stopPropagation()}
+        {activeTab === "daily" && (
+          <div className="dashboard-main">
+            {/* Notes + Brain Dump Column */}
+            <div className="notes-column">
+              <div className="panel panel-half">
+                <h2 className="panel-label">NOTES</h2>
+                {isLoading ? (
+                  <p className="panel-empty">Loading...</p>
+                ) : error ? (
+                  <p className="panel-empty">{error}</p>
+                ) : notes.length === 0 ? (
+                  <p className="panel-empty">No notes yet</p>
+                ) : (
+                  <div className="notes-list">
+                    {notes.map((note) => (
+                      <div key={note.id} className="note-card">
+                        <div className="note-card-header">
+                          <h3 className="note-title">{note.title}</h3>
+                          <div className="note-menu-container">
+                            <button
+                              className="note-menu-btn"
+                              onClick={(e) => handleMenuToggle(note.id, e)}
                             >
-                              <button
-                                className="menu-item edit-item"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditNote(note);
-                                  closeMenu();
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="menu-item duplicate-item"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  closeMenu();
-                                }}
-                              >
-                                Duplicate
-                              </button>
-                              <button
-                                className="menu-item delete-item"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  closeMenu();
-                                  handleDeleteNote(note.id);
-                                }}
-                              >
-                                Delete
-                              </button>
+                              ⋮
+                            </button>
+                            {openMenuNoteId === note.id && (
                               <div
-                                className={`menu-submenu ${openSubmenuNoteId === note.id ? "active" : ""}`}
+                                className="note-menu-dropdown"
+                                onClick={(e) => e.stopPropagation()}
                               >
                                 <button
-                                  className="submenu-label"
-                                  onClick={(e) =>
-                                    handleSubmenuToggle(note.id, e)
-                                  }
+                                  className="menu-item edit-item"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditNote(note);
+                                    closeMenu();
+                                  }}
                                 >
-                                  Move to folder
+                                  Edit
                                 </button>
-                                {openSubmenuNoteId === note.id && (
-                                  <div className="submenu-options">
-                                    <button
-                                      className="submenu-item"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleMoveNoteToFolder(note.id, null);
-                                        closeMenu();
-                                      }}
-                                    >
-                                      None
-                                    </button>
-                                    {folders.map((folder) => (
+                                <button
+                                  className="menu-item duplicate-item"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    closeMenu();
+                                  }}
+                                >
+                                  Duplicate
+                                </button>
+                                <button
+                                  className="menu-item delete-item"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    closeMenu();
+                                    handleDeleteNote(note.id);
+                                  }}
+                                >
+                                  Delete
+                                </button>
+                                <div
+                                  className={`menu-submenu ${openSubmenuNoteId === note.id ? "active" : ""}`}
+                                >
+                                  <button
+                                    className="submenu-label"
+                                    onClick={(e) =>
+                                      handleSubmenuToggle(note.id, e)
+                                    }
+                                  >
+                                    Move to folder
+                                  </button>
+                                  {openSubmenuNoteId === note.id && (
+                                    <div className="submenu-options">
                                       <button
-                                        key={folder.id}
                                         className="submenu-item"
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          handleMoveNoteToFolder(
-                                            note.id,
-                                            folder.id,
-                                          );
+                                          handleMoveNoteToFolder(note.id, null);
                                           closeMenu();
                                         }}
                                       >
-                                        {folder.name}
+                                        None
                                       </button>
-                                    ))}
-                                  </div>
-                                )}
+                                      {folders.map((folder) => (
+                                        <button
+                                          key={folder.id}
+                                          className="submenu-item"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleMoveNoteToFolder(
+                                              note.id,
+                                              folder.id,
+                                            );
+                                            closeMenu();
+                                          }}
+                                        >
+                                          {folder.name}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
+                        </div>
+                        <p className="note-preview">
+                          {note.content.replace(/<[^>]*>/g, "")}
+                        </p>
+                        <div className="note-footer">
+                          <span className="note-date">
+                            {formatDate(note.createdAt)}
+                          </span>
+                          <div className="note-tags">
+                            {note.tags?.map((tag) => (
+                              <span key={tag} className="note-tag-pill">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                      <p className="note-preview">
-                        {note.content.replace(/<[^>]*>/g, "")}
-                      </p>
-                      <div className="note-footer">
-                        <span className="note-date">
-                          {formatDate(note.createdAt)}
-                        </span>
-                        <div className="note-tags">
-                          {note.tags?.map((tag) => (
-                            <span key={tag} className="note-tag-pill">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                )}
+                {!isLoading && (
+                  <button
+                    className="new-item-button"
+                    onClick={handleCreateNote}
+                  >
+                    + New note
+                  </button>
+                )}
+              </div>
+
+              {/* Brain Dump */}
+              <div className="panel panel-half brain-dump-panel">
+                <div className="brain-dump-header">
+                  <h2 className="panel-label">Brain Dump</h2>
+                  {brainDumpSaving && (
+                    <span className="brain-dump-saving">saving…</span>
+                  )}
                 </div>
+                <textarea
+                  className="brain-dump-textarea"
+                  placeholder="Quick capture, no need to organise..."
+                  value={brainDumpContent}
+                  onChange={(e) => setBrainDumpContent(e.target.value)}
+                  onBlur={handleBrainDumpBlur}
+                />
+              </div>
+            </div>
+
+            {/* Todos Panel */}
+            <div className="panel">
+              <h2 className="panel-label">TODOS</h2>
+              {isLoading ? (
+                <p className="panel-empty">Loading...</p>
+              ) : (
+                <>
+                  {todayTodos.length > 0 && (
+                    <div className="todo-section">
+                      <h3 className="todo-section-label">Today</h3>
+                      {todayTodos.map((todo) => (
+                        <div key={todo.id} className="todo-item">
+                          <div className="todo-content">
+                            <button
+                              className={`todo-circle-btn ${todo.completed ? "checked" : ""}`}
+                              onClick={() => handleCompletedChange(todo.id)}
+                              aria-label={
+                                todo.completed
+                                  ? "Mark incomplete"
+                                  : "Mark complete"
+                              }
+                            >
+                              {todo.completed ? (
+                                <svg
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <circle cx="10" cy="10" r="10" />
+                                  <path
+                                    d="M6 10.5l2.5 2.5 5.5-5.5"
+                                    stroke="white"
+                                    strokeWidth="1.75"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    fill="none"
+                                  />
+                                </svg>
+                              ) : (
+                                <svg
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <circle
+                                    cx="10"
+                                    cy="10"
+                                    r="9"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                            <span
+                              className={`todo-title ${todo.completed ? "completed" : ""}`}
+                            >
+                              {todo.content}
+                            </span>
+                          </div>
+                          <div className="todo-actions">
+                            <button
+                              className="todo-delete-btn"
+                              onClick={() => handleDeleteTodo(todo.id)}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {pendingTodos.length > 0 && (
+                    <div className="todo-section">
+                      <h3 className="todo-section-label">Pending</h3>
+                      {pendingTodos.map((todo) => (
+                        <div key={todo.id} className="todo-item">
+                          <div className="todo-content">
+                            <button
+                              className={`todo-circle-btn ${todo.completed ? "checked" : ""}`}
+                              onClick={() => handleCompletedChange(todo.id)}
+                              aria-label={
+                                todo.completed
+                                  ? "Mark incomplete"
+                                  : "Mark complete"
+                              }
+                            >
+                              {todo.completed ? (
+                                <svg
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <circle cx="10" cy="10" r="10" />
+                                  <path
+                                    d="M6 10.5l2.5 2.5 5.5-5.5"
+                                    stroke="white"
+                                    strokeWidth="1.75"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    fill="none"
+                                  />
+                                </svg>
+                              ) : (
+                                <svg
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <circle
+                                    cx="10"
+                                    cy="10"
+                                    r="9"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                            <span
+                              className={`todo-title ${todo.completed ? "completed" : ""}`}
+                            >
+                              {todo.content}
+                            </span>
+                          </div>
+                          <div className="todo-actions">
+                            <button
+                              className="todo-delete-btn"
+                              onClick={() => handleDeleteTodo(todo.id)}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {todayTodos.length === 0 && pendingTodos.length === 0 && (
+                    <p className="panel-empty">No todos yet</p>
+                  )}
+                </>
               )}
               {!isLoading && (
-                <button className="new-item-button" onClick={handleCreateNote}>
-                  + New note
+                <button className="new-item-button" onClick={handleCreateTodo}>
+                  + New todo
                 </button>
               )}
             </div>
 
-            {/* Brain Dump */}
-            <div className="panel panel-half brain-dump-panel">
-              <div className="brain-dump-header">
-                <h2 className="panel-label">Brain Dump</h2>
-                {brainDumpSaving && (
-                  <span className="brain-dump-saving">saving…</span>
+            {/* Right Panel */}
+            <div className="right-panel">
+              {/* Clock */}
+              <div className="clock-card">
+                <div className="clock-time">{clockTime}</div>
+                <div className="clock-day">{clockDay}</div>
+              </div>
+
+              {/* Today's Review */}
+              <div className="panel-card review-card">
+                <button
+                  className="panel-label review-btn"
+                  onClick={handleReview}
+                  disabled={reviewLoading}
+                >
+                  {reviewLoading ? "Generating..." : "Today's Review"}
+                </button>
+                {reviewSummary && (
+                  <p className="review-summary">{reviewSummary}</p>
                 )}
               </div>
-              <textarea
-                className="brain-dump-textarea"
-                placeholder="Quick capture, no need to organise..."
-                value={brainDumpContent}
-                onChange={(e) => setBrainDumpContent(e.target.value)}
-                onBlur={handleBrainDumpBlur}
-              />
             </div>
           </div>
+        )}
 
-          {/* Todos Panel */}
-          <div className="panel">
-            <h2 className="panel-label">TODOS</h2>
-            {isLoading ? (
-              <p className="panel-empty">Loading...</p>
-            ) : (
-              <>
-                {todayTodos.length > 0 && (
-                  <div className="todo-section">
-                    <h3 className="todo-section-label">Today</h3>
-                    {todayTodos.map((todo) => (
-                      <div key={todo.id} className="todo-item">
-                        <div className="todo-content">
-                          <button
-                            className={`todo-circle-btn ${todo.completed ? "checked" : ""}`}
-                            onClick={() => handleCompletedChange(todo.id)}
-                            aria-label={
-                              todo.completed
-                                ? "Mark incomplete"
-                                : "Mark complete"
-                            }
-                          >
-                            {todo.completed ? (
-                              <svg
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle cx="10" cy="10" r="10" />
-                                <path
-                                  d="M6 10.5l2.5 2.5 5.5-5.5"
-                                  stroke="white"
-                                  strokeWidth="1.75"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  fill="none"
-                                />
-                              </svg>
-                            ) : (
-                              <svg
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle
-                                  cx="10"
-                                  cy="10"
-                                  r="9"
-                                  stroke="currentColor"
-                                  strokeWidth="1.5"
-                                />
-                              </svg>
-                            )}
-                          </button>
-                          <span
-                            className={`todo-title ${todo.completed ? "completed" : ""}`}
-                          >
-                            {todo.content}
-                          </span>
-                        </div>
-                        <div className="todo-actions">
-                          <button
-                            className="todo-delete-btn"
-                            onClick={() => handleDeleteTodo(todo.id)}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {pendingTodos.length > 0 && (
-                  <div className="todo-section">
-                    <h3 className="todo-section-label">Pending</h3>
-                    {pendingTodos.map((todo) => (
-                      <div key={todo.id} className="todo-item">
-                        <div className="todo-content">
-                          <button
-                            className={`todo-circle-btn ${todo.completed ? "checked" : ""}`}
-                            onClick={() => handleCompletedChange(todo.id)}
-                            aria-label={
-                              todo.completed
-                                ? "Mark incomplete"
-                                : "Mark complete"
-                            }
-                          >
-                            {todo.completed ? (
-                              <svg
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle cx="10" cy="10" r="10" />
-                                <path
-                                  d="M6 10.5l2.5 2.5 5.5-5.5"
-                                  stroke="white"
-                                  strokeWidth="1.75"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  fill="none"
-                                />
-                              </svg>
-                            ) : (
-                              <svg
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle
-                                  cx="10"
-                                  cy="10"
-                                  r="9"
-                                  stroke="currentColor"
-                                  strokeWidth="1.5"
-                                />
-                              </svg>
-                            )}
-                          </button>
-                          <span
-                            className={`todo-title ${todo.completed ? "completed" : ""}`}
-                          >
-                            {todo.content}
-                          </span>
-                        </div>
-                        <div className="todo-actions">
-                          <button
-                            className="todo-delete-btn"
-                            onClick={() => handleDeleteTodo(todo.id)}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {todayTodos.length === 0 && pendingTodos.length === 0 && (
-                  <p className="panel-empty">No todos yet</p>
-                )}
-              </>
-            )}
-            {!isLoading && (
-              <button className="new-item-button" onClick={handleCreateTodo}>
-                + New todo
-              </button>
-            )}
-          </div>
-
-          {/* Right Panel */}
-          <div className="right-panel">
-            {/* Clock */}
-            <div className="clock-card">
-              <div className="clock-time">{clockTime}</div>
-              <div className="clock-day">{clockDay}</div>
-            </div>
-
-            {/* Today's Review */}
-            <div className="panel-card review-card">
-              <button
-                className="panel-label review-btn"
-                onClick={handleReview}
-                disabled={reviewLoading}
-              >
-                {reviewLoading ? "Generating..." : "Today's Review"}
-              </button>
-              {reviewSummary && (
-                <p className="review-summary">{reviewSummary}</p>
-              )}
+        {/* Notes tab */}
+        {activeTab === "notes" && (
+          <div className="dashboard-main tab-view">
+            <div className="panel">
+              <h2 className="panel-label">Notes</h2>
+              <p className="panel-empty">Notes management coming soon.</p>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Review tab */}
+        {activeTab === "review" && (
+          <div className="dashboard-main tab-view">
+            <WeekReviewPage />
+          </div>
+        )}
       </div>
 
       {/* Modals */}

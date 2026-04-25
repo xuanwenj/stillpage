@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Note from "../models/note.model";
 import Todo from "../models/todo.model";
 import BrainDump from "../models/braindump.model";
+import DailyReview from "../models/dailyreview.model";
 import Anthropic from "@anthropic-ai/sdk";
 import { Types } from "mongoose";
 
@@ -18,9 +19,11 @@ export const getDailyReview = async (req: AuthRequest, res: Response) => {
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const date = todayString();
-    const todos = await Todo.find({ userId, date });
-    const notes = await Note.find({ userId, date });
-    const braindump = await BrainDump.findOne({ userId, date });
+    const [todos, notes, braindump] = await Promise.all([
+      Todo.find({ userId, date }),
+      Note.find({ userId, date }),
+      BrainDump.findOne({ userId, date }),
+    ]);
 
     const completedTodos =
       todos.length > 0
@@ -86,6 +89,13 @@ export const getDailyReview = async (req: AuthRequest, res: Response) => {
     const tomorrow = tomorrowString();
     const userObjectId = new Types.ObjectId(userId);
 
+    // Save daily summary to DailyReview collection
+    await DailyReview.findOneAndUpdate(
+      { userId: userObjectId, date },
+      { summary: parsed.summary },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+    );
+
     // Save AI suggestions as new todos with tomorrow's date
     if (parsed.tomorrowSuggestions.length > 0) {
       await Todo.insertMany(
@@ -115,8 +125,54 @@ export const getDailyReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const getWeeklyReview = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const weekStart = getWeekStart();
+    const weekEnd = getWeekEnd();
+    const userObjectId = new Types.ObjectId(userId);
+
+    const dailyReviews = await DailyReview.find({
+      userId: userObjectId,
+      date: { $gte: weekStart, $lte: weekEnd },
+    }).sort({ date: 1 });
+
+    if (dailyReviews.length === 0) {
+      return res.status(200).json({
+        summary: null,
+        message: "No daily reviews found for this week.",
+      });
+    }
+
+    // TODO: build prompt and call Claude
+
+    return res.status(200).json({ summary: "placeholder" });
+  } catch (error) {
+    console.error("getWeeklyReview error:", error);
+    return res.status(500).json({ message: "Error generating weekly review" });
+  }
+};
+
 function todayString(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function getWeekStart(): string {
+  const today = new Date();
+  const dayOfWeek = (today.getDay() + 6) % 7; // Mon=0 ... Sun=6
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - dayOfWeek);
+  return monday.toISOString().slice(0, 10);
+}
+
+function getWeekEnd(): string {
+  const today = new Date();
+  const dayOfWeek = (today.getDay() + 6) % 7;
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() + (6 - dayOfWeek));
+  return sunday.toISOString().slice(0, 10);
 }
 
 function tomorrowString(): string {
