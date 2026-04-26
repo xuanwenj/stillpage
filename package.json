@@ -1,9 +1,11 @@
 {
   "devDependencies": {
+    "@types/luxon": "^3.7.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.90.0"
+    "@anthropic-ai/sdk": "^0.90.0",
+    "luxon": "^3.7.2"
   }
 }

@@ -4,8 +4,10 @@ import {
   getAllTodos,
   updateTodo,
   deleteTodo,
+  getWeeklyStats,
 } from "../controllers/todo.controller";
 import { authenticate } from "../middlewares/auth.middleware";
+import { todo } from "node:test";
 
 const todoRouter: Router = express.Router();
 
@@ -42,5 +44,11 @@ todoRouter.put("/:id", authenticate, updateTodo);
  * Params: id (todo ID)
  */
 todoRouter.delete("/:id", authenticate, deleteTodo);
+
+/**
+ * GET /api/todos/stats
+ * Get weekly stats of completed todos
+ */
+todoRouter.get("/stats", authenticate, getWeeklyStats);
 
 export default todoRouter;

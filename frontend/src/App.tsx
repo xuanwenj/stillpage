@@ -9,6 +9,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { WeekReviewPage } from "./pages/WeekReviewPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected pages */}
+
           <Route
             path="/dashboard"
             element={
@@ -27,7 +29,12 @@ function App() {
                 <DashboardPage />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<Navigate to="daily" replace />} />
+            <Route path="daily" element={<div>Daily View Coming Soon</div>} />
+            <Route path="notes" element={<div>Notes View Coming Soon</div>} />
+            <Route path="review" element={<WeekReviewPage />} />
+          </Route>
 
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

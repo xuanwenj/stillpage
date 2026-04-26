@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { Request, Response, NextFunction } from "express";
 import Todo, { ITodo } from "../models/todo.model";
 import { Types } from "mongoose";
@@ -173,6 +174,63 @@ export const getAllTodos = async (
     res.status(500).json({
       message: "Error fetching todos",
       error: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
+
+export const getWeeklyStats = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // 1. Get timezone from query parameter
+    const timezone = req.query.timezone as string;
+    if (!timezone) {
+      return res.status(400).json({ error: "Timezone is required" });
+    }
+
+    // 2. Get user ID from authentication middleware
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    // 3. Get current time in user's timezone
+    const now = DateTime.now().setZone(timezone);
+
+    // 4. Always find the most recent Monday 00:00 in user's timezone
+    const weekStart = now.minus({ days: now.weekday - 1 }).startOf("day");
+    // 5. Always find the upcoming Sunday 23:59:59 in user's timezone
+    const weekEnd = weekStart.plus({ days: 6 }).endOf("day");
+
+    // 6. Convert to UTC for MongoDB query
+    const startUTC = weekStart.toUTC().toJSDate();
+    const endUTC = weekEnd.toUTC().toJSDate();
+
+    // 7. Query todos for this user in this week
+    const todos = await Todo.find({
+      userId: userId,
+      createdAt: { $gte: startUTC, $lte: endUTC },
+    });
+
+    // 8. Optionally, build a summary (total, completed, etc.)
+    const total = todos.length;
+    const completed = todos.filter((todo) => todo.completed).length;
+    const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+    console.log("weekStart:", weekStart.toString());
+    console.log("weekEnd:", weekEnd.toString());
+    console.log("todos found:", todos.length);
+    res.json({
+      total,
+      completed,
+      rate,
+      todos,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Server error",
+      details: error instanceof Error ? error.message : String(error),
     });
   }
 };
