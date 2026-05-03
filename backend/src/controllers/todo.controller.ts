@@ -161,6 +161,15 @@ export const getAllTodos = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+    const timezone = (req.query.timezone as string) || "UTC";
+    const today = DateTime.now().setZone(timezone).toISODate()!;
+
+    // Promote past-pending todos (incomplete, date < today) to today
+    await Todo.updateMany(
+      { userId, archived: false, completed: false, date: { $lt: today } },
+      { $set: { date: today } },
+    );
+
     const todos = await Todo.find({ userId, archived: false }).sort({
       createdAt: -1,
     });

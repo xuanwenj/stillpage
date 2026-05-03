@@ -238,7 +238,13 @@ export const DashboardPage = () => {
     }
   };
 
-  const todayString = () => new Date().toISOString().slice(0, 10);
+  const todayString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const todayTodos = todos.filter((t) => t.date === todayString());
   const pendingTodos = todos.filter(
@@ -500,18 +506,20 @@ export const DashboardPage = () => {
                       ))}
                     </div>
                   )}
-                  {pendingTodos.length > 0 && (
-                    <div className="todo-section">
-                      {!isLoading && (
-                        <button
-                          className="new-item-button"
-                          onClick={handleCreateTodo}
-                        >
-                          + New todo
-                        </button>
-                      )}
-                      <h3 className="todo-section-label">Pending</h3>
-                      {pendingTodos.map((todo) => (
+                  <div className="todo-section">
+                    {!isLoading && (
+                      <button
+                        className="new-item-button"
+                        onClick={handleCreateTodo}
+                      >
+                        + New todo
+                      </button>
+                    )}
+                    <h3 className="todo-section-label">Upcoming</h3>
+                    {pendingTodos.length === 0 ? (
+                      <p className="panel-empty">Nothing upcoming</p>
+                    ) : (
+                      pendingTodos.map((todo) => (
                         <div key={todo.id} className="todo-item">
                           <div className="todo-content">
                             <span className="todo-title">{todo.content}</span>
@@ -525,11 +533,11 @@ export const DashboardPage = () => {
                             </button>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                  {todayTodos.length === 0 && pendingTodos.length === 0 && (
-                    <p className="panel-empty">No todos yet</p>
+                      ))
+                    )}
+                  </div>
+                  {todayTodos.length === 0 && (
+                    <p className="panel-empty">No todos for today</p>
                   )}
                 </>
               )}

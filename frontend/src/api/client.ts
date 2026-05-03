@@ -117,11 +117,12 @@ export const folderApi = {
 // Todo endpoints
 export const todoApi = {
   getAllTodos: async () => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const response = await apiClient.get<{
       message: string;
       count: number;
       todos: Todo[];
-    }>("/todos");
+    }>("/todos", { params: { timezone } });
     return { data: response.data.todos };
   },
 
