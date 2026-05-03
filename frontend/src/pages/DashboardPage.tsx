@@ -502,56 +502,19 @@ export const DashboardPage = () => {
                   )}
                   {pendingTodos.length > 0 && (
                     <div className="todo-section">
+                      {!isLoading && (
+                        <button
+                          className="new-item-button"
+                          onClick={handleCreateTodo}
+                        >
+                          + New todo
+                        </button>
+                      )}
                       <h3 className="todo-section-label">Pending</h3>
                       {pendingTodos.map((todo) => (
                         <div key={todo.id} className="todo-item">
                           <div className="todo-content">
-                            <button
-                              className={`todo-circle-btn ${todo.completed ? "checked" : ""}`}
-                              onClick={() => handleCompletedChange(todo.id)}
-                              aria-label={
-                                todo.completed
-                                  ? "Mark incomplete"
-                                  : "Mark complete"
-                              }
-                            >
-                              {todo.completed ? (
-                                <svg
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <circle cx="10" cy="10" r="10" />
-                                  <path
-                                    d="M6 10.5l2.5 2.5 5.5-5.5"
-                                    stroke="white"
-                                    strokeWidth="1.75"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    fill="none"
-                                  />
-                                </svg>
-                              ) : (
-                                <svg
-                                  viewBox="0 0 20 20"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <circle
-                                    cx="10"
-                                    cy="10"
-                                    r="9"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                  />
-                                </svg>
-                              )}
-                            </button>
-                            <span
-                              className={`todo-title ${todo.completed ? "completed" : ""}`}
-                            >
-                              {todo.content}
-                            </span>
+                            <span className="todo-title">{todo.content}</span>
                           </div>
                           <div className="todo-actions">
                             <button
@@ -569,11 +532,6 @@ export const DashboardPage = () => {
                     <p className="panel-empty">No todos yet</p>
                   )}
                 </>
-              )}
-              {!isLoading && (
-                <button className="new-item-button" onClick={handleCreateTodo}>
-                  + New todo
-                </button>
               )}
             </div>
 
