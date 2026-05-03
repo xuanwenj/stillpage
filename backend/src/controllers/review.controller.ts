@@ -3,6 +3,7 @@ import Note from "../models/note.model";
 import Todo from "../models/todo.model";
 import BrainDump from "../models/braindump.model";
 import DailyReview from "../models/dailyreview.model";
+import weekreviewModel from "../models/weekreview.model";
 import Anthropic from "@anthropic-ai/sdk";
 import { Types } from "mongoose";
 
@@ -147,8 +148,41 @@ export const getWeeklyReview = async (req: AuthRequest, res: Response) => {
     }
 
     // TODO: build prompt and call Claude
+    const summaries = dailyReviews
+      .map((dr) => `-${dr.date}: ${dr.summary}`)
+      .join("\n");
+    const promt = `You are a thoughtful personal productivity companion writing a warm, encouraging weekly review letter.
 
-    return res.status(200).json({ summary: "placeholder" });
+You will be given the user's daily reviews for the past week. Your job is to reflect on the week at a high level — not to count tasks or list specifics, but to identify the broader themes of what the user spent their energy on.
+
+Guidelines:
+- Group the completed todos into natural categories (e.g. project work, learning, life admin, job search, etc.) based on their content. Only include categories that are actually present.
+- Reflect on each category briefly — what kind of work it represents, the effort behind it.
+- Keep the tone warm, encouraging, and human. This is a letter to a friend, not a report.
+- End with a short, genuine closing that acknowledges the week as a whole and gently looks forward to the next.
+- Do NOT list individual tasks or give counts like "you completed 5 todos". Stay at the thematic level.
+- Write in a natural, conversational style. Avoid corporate or robotic language.
+- Length: around 200–300 words.
+
+Here is the user's data for this week:
+  Daily reviews: ${summaries}
+  
+  Write the weekly review letter now, and respond ONLY with the letter text. Do not include any explanations, formatting, or markdown.`;
+    const message = await client.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1000,
+      messages: [{ role: "user", content: promt }],
+    });
+
+    const summary =
+      message.content[0].type === "text" ? message.content[0].text.trim() : "";
+    await weekreviewModel.findOneAndUpdate(
+      { userId: userObjectId, weekStart, weekEnd },
+      { summary },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+    );
+    console.log("Generated weekly review:", summary);
+    return res.status(200).json({ summary });
   } catch (error) {
     console.error("getWeeklyReview error:", error);
     return res.status(500).json({ message: "Error generating weekly review" });

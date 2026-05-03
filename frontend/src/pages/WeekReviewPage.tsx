@@ -1,6 +1,6 @@
 import "../styles/weekreview.css";
 import { useEffect, useState } from "react";
-import apiClient from "../api/client";
+import apiClient, { reviewApi } from "../api/client";
 const getWeekRangeString = (start: Date, end: Date) => {
   const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
   return `${start.toLocaleDateString(undefined, opts)} – ${end.toLocaleDateString(undefined, opts)}`;
@@ -17,6 +17,8 @@ export const WeekReviewPage = () => {
   });
   const [weekRange, setWeekRange] = useState("");
   const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     console.log("Fetching weekly summary with timezone:", timezone);
@@ -124,8 +126,22 @@ export const WeekReviewPage = () => {
         </div> */}
 
         {/* Generate button */}
-        <button className="wr-generate-btn">
-          Generate this week's review&nbsp;↗
+        <button
+          className="wr-generate-btn"
+          disabled={generating}
+          onClick={async () => {
+            setGenerating(true);
+            try {
+              const res = await reviewApi.performWeekReview();
+              setSummary(res.data.summary);
+            } catch {
+              alert("Failed to generate weekly review. Please try again.");
+            } finally {
+              setGenerating(false);
+            }
+          }}
+        >
+          {generating ? "Generating…" : "Generate this week's review ↗"}
         </button>
       </div>
 
@@ -133,11 +149,15 @@ export const WeekReviewPage = () => {
       <div className="wr-right">
         <span className="wr-section-label">Week Review</span>
         <div className="wr-review-body">
-          <p className="wr-review-placeholder">
-            No review generated yet.
-            <br />
-            Click <strong>Generate this week's review</strong> to get started.
-          </p>
+          {summary ? (
+            summary.split("\n").map((line, i) => <p key={i}>{line}</p>)
+          ) : (
+            <p className="wr-review-placeholder">
+              No review generated yet.
+              <br />
+              Click <strong>Generate this week's review</strong> to get started.
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -160,6 +160,8 @@ export const reviewApi = {
     apiClient.post<{ summary: string; tomorrowSuggestions: string[] }>(
       "/review/daily",
     ),
+  performWeekReview: () =>
+    apiClient.post<{ summary: string }>("/review/weekly"),
 };
 
 export default apiClient;
