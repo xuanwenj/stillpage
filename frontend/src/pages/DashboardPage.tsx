@@ -13,10 +13,13 @@ import { CreateFolder } from "../components/CreateFolder";
 import { CreateTodo } from "../components/CreateTodo";
 import { WeekReviewPage } from "./WeekReviewPage";
 import type { Note, Folder, Todo, BrainDump } from "../types";
+import { useToast, useConfirm } from "../toast";
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -110,13 +113,20 @@ export const DashboardPage = () => {
   };
 
   const handleDeleteNote = async (noteId: string) => {
-    if (window.confirm("Are you sure you want to delete this note?")) {
+    const ok = await confirm({
+      title: "Delete Note",
+      message: "Are you sure you want to delete this note?",
+      confirmLabel: "Delete",
+      variant: "danger",
+    });
+    if (ok) {
       try {
         await noteApi.deleteNote(noteId);
         setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+        toast.success("Note deleted.");
       } catch (err) {
         console.error("Failed to delete note:", err);
-        alert("Failed to delete the note. Please try again.");
+        toast.error("Failed to delete the note. Please try again.");
       }
     }
   };
@@ -141,10 +151,12 @@ export const DashboardPage = () => {
           note.id === noteId ? ({ ...note, folderId } as Note) : note,
         ),
       );
-      console.log("Moved note to no folder clicked");
+      toast.success(
+        folderId ? "Note moved to folder." : "Note removed from folder.",
+      );
     } catch (err) {
       console.error("Failed to move note:", err);
-      alert("Failed to move the note. Please try again.");
+      toast.error("Failed to move the note. Please try again.");
     }
   };
 
@@ -179,13 +191,20 @@ export const DashboardPage = () => {
   };
 
   const handleDeleteTodo = async (todoId: string) => {
-    if (window.confirm("Are you sure you want to delete this todo?")) {
+    const ok = await confirm({
+      title: "Delete Todo",
+      message: "Are you sure you want to delete this todo?",
+      confirmLabel: "Delete",
+      variant: "danger",
+    });
+    if (ok) {
       try {
         await todoApi.deleteTodo(todoId);
         setTodos((prev) => prev.filter((t) => t.id !== todoId));
+        toast.success("Todo deleted.");
       } catch (err) {
         console.error("Failed to delete todo:", err);
-        alert("Failed to delete the todo. Please try again.");
+        toast.error("Failed to delete the todo. Please try again.");
       }
     }
   };
@@ -226,9 +245,10 @@ export const DashboardPage = () => {
       const res = await reviewApi.performReview();
       setReviewSummary(res.data.summary);
       await fetchData();
+      toast.success("Review completed.");
     } catch (err) {
       console.error("Review error:", err);
-      alert("Failed to perform the review. Please try again.");
+      toast.error("Failed to perform the review. Please try again.");
     } finally {
       setReviewLoading(false);
     }

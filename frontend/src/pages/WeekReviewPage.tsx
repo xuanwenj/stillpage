@@ -1,6 +1,7 @@
 import "../styles/weekreview.css";
 import { useEffect, useState } from "react";
 import apiClient, { reviewApi } from "../api/client";
+import { useToast } from "../toast";
 const getWeekRangeString = (start: Date, end: Date) => {
   const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
   return `${start.toLocaleDateString(undefined, opts)} – ${end.toLocaleDateString(undefined, opts)}`;
@@ -19,6 +20,7 @@ export const WeekReviewPage = () => {
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     console.log("Fetching weekly summary with timezone:", timezone);
@@ -134,8 +136,11 @@ export const WeekReviewPage = () => {
             try {
               const res = await reviewApi.performWeekReview();
               setSummary(res.data.summary);
+              toast.success("Weekly review generated.");
             } catch {
-              alert("Failed to generate weekly review. Please try again.");
+              toast.error(
+                "Failed to generate weekly review. Please try again.",
+              );
             } finally {
               setGenerating(false);
             }
