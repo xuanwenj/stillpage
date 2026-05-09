@@ -42,6 +42,8 @@ export const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState<"daily" | "notes" | "review">(
     "daily",
   );
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [clockTime, setClockTime] = useState(() => {
     const now = new Date();
     return now.toLocaleTimeString("en-US", {
@@ -300,140 +302,10 @@ export const DashboardPage = () => {
         {/* Three-panel grid */}
         {activeTab === "daily" && (
           <div className="dashboard-main">
-            {/* Notes + Brain Dump Column */}
+            {/* Brain Dump Column */}
             <div className="notes-column">
-              <div className="panel panel-half">
-                <h2 className="panel-label">NOTES</h2>
-                {isLoading ? (
-                  <p className="panel-empty">Loading...</p>
-                ) : error ? (
-                  <p className="panel-empty">{error}</p>
-                ) : notes.length === 0 ? (
-                  <p className="panel-empty">No notes yet</p>
-                ) : (
-                  <div className="notes-list">
-                    {notes.map((note) => (
-                      <div key={note.id} className="note-card">
-                        <div className="note-card-header">
-                          <h3 className="note-title">{note.title}</h3>
-                          <div className="note-menu-container">
-                            <button
-                              className="note-menu-btn"
-                              onClick={(e) => handleMenuToggle(note.id, e)}
-                            >
-                              ⋮
-                            </button>
-                            {openMenuNoteId === note.id && (
-                              <div
-                                className="note-menu-dropdown"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <button
-                                  className="menu-item edit-item"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditNote(note);
-                                    closeMenu();
-                                  }}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="menu-item duplicate-item"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    closeMenu();
-                                  }}
-                                >
-                                  Duplicate
-                                </button>
-                                <button
-                                  className="menu-item delete-item"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    closeMenu();
-                                    handleDeleteNote(note.id);
-                                  }}
-                                >
-                                  Delete
-                                </button>
-                                <div
-                                  className={`menu-submenu ${openSubmenuNoteId === note.id ? "active" : ""}`}
-                                >
-                                  <button
-                                    className="submenu-label"
-                                    onClick={(e) =>
-                                      handleSubmenuToggle(note.id, e)
-                                    }
-                                  >
-                                    Move to folder
-                                  </button>
-                                  {openSubmenuNoteId === note.id && (
-                                    <div className="submenu-options">
-                                      <button
-                                        className="submenu-item"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleMoveNoteToFolder(note.id, null);
-                                          closeMenu();
-                                        }}
-                                      >
-                                        None
-                                      </button>
-                                      {folders.map((folder) => (
-                                        <button
-                                          key={folder.id}
-                                          className="submenu-item"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleMoveNoteToFolder(
-                                              note.id,
-                                              folder.id,
-                                            );
-                                            closeMenu();
-                                          }}
-                                        >
-                                          {folder.name}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <p className="note-preview">
-                          {note.content.replace(/<[^>]*>/g, "")}
-                        </p>
-                        <div className="note-footer">
-                          <span className="note-date">
-                            {formatDate(note.createdAt)}
-                          </span>
-                          <div className="note-tags">
-                            {note.tags?.map((tag) => (
-                              <span key={tag} className="note-tag-pill">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {!isLoading && (
-                  <button
-                    className="new-item-button"
-                    onClick={handleCreateNote}
-                  >
-                    + New note
-                  </button>
-                )}
-              </div>
-
               {/* Brain Dump */}
-              <div className="panel panel-half brain-dump-panel">
+              <div className="panel brain-dump-panel">
                 <div className="brain-dump-header">
                   <h2 className="panel-label">Brain Dump</h2>
                   {brainDumpSaving && (
@@ -586,10 +458,128 @@ export const DashboardPage = () => {
 
         {/* Notes tab */}
         {activeTab === "notes" && (
-          <div className="dashboard-main tab-view">
-            <div className="panel">
-              <h2 className="panel-label">Notes</h2>
-              <p className="panel-empty">Notes management coming soon.</p>
+          <div className="dashboard-main notes-layout">
+            {/* Left: Folders */}
+            <div className="notes-folders-panel">
+              <div className="folders-header">
+                <h2 className="panel-label">NOTES</h2>
+                <button className="folder-add-btn">+</button>
+              </div>
+              <div className="folders-list">
+                <button
+                  className={`folder-item inbox-folder ${selectedFolderId === null ? "active" : ""}`}
+                  onClick={() => setSelectedFolderId(null)}
+                >
+                  <span className="folder-name">Inbox</span>
+                  <span className="folder-count">
+                    {notes.filter((n) => !n.folderId).length}
+                  </span>
+                </button>
+                {folders.map((folder) => {
+                  const folderNotes = notes.filter(
+                    (n) => n.folderId === folder.id,
+                  );
+                  return (
+                    <button
+                      key={folder.id}
+                      className={`folder-item ${selectedFolderId === folder.id ? "active" : ""}`}
+                      onClick={() => setSelectedFolderId(folder.id)}
+                    >
+                      <span className="folder-icon">📁</span>
+                      <span className="folder-name">{folder.name}</span>
+                      <span className="folder-count">{folderNotes.length}</span>
+                    </button>
+                  );
+                })}
+                <button className="new-folder-btn">+ New folder</button>
+              </div>
+            </div>
+
+            {/* Middle: Notes List */}
+            <div className="notes-list-panel">
+              <div className="notes-list-header">
+                <h2 className="panel-label">
+                  {selectedFolderId
+                    ? folders.find((f) => f.id === selectedFolderId)?.name
+                    : "Inbox"}
+                </h2>
+                <div className="notes-list-actions">
+                  <span className="unsorted-badge">
+                    {
+                      notes.filter((n) =>
+                        selectedFolderId === null
+                          ? !n.folderId
+                          : n.folderId === selectedFolderId,
+                      ).length
+                    }{" "}
+                    unsorted
+                  </span>
+                  <button className="notes-list-action-btn">+</button>
+                </div>
+              </div>
+              <div className="notes-list-container">
+                {notes
+                  .filter((n) =>
+                    selectedFolderId === null
+                      ? !n.folderId
+                      : n.folderId === selectedFolderId,
+                  )
+                  .map((note) => (
+                    <div
+                      key={note.id}
+                      className={`notes-list-item ${selectedNoteId === note.id ? "active" : ""}`}
+                      onClick={() => setSelectedNoteId(note.id)}
+                    >
+                      <div className="notes-list-item-header">
+                        {note.tags?.[0] && (
+                          <span className="note-tag-indicator">●</span>
+                        )}
+                        <h3 className="notes-list-item-title">{note.title}</h3>
+                      </div>
+                      <p className="notes-list-item-preview">
+                        {note.content.replace(/<[^>]*>/g, "").substring(0, 100)}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Right: Note Detail */}
+            <div className="note-detail-panel">
+              {selectedNoteId && notes.find((n) => n.id === selectedNoteId) ? (
+                (() => {
+                  const note = notes.find((n) => n.id === selectedNoteId)!;
+                  return (
+                    <div className="note-detail-content">
+                      <div className="note-detail-header">
+                        <h1 className="note-detail-title">{note.title}</h1>
+                        <div className="note-detail-actions">
+                          <button className="note-detail-action-btn">
+                            Move to folder
+                          </button>
+                          <button className="note-detail-action-btn">🗑</button>
+                        </div>
+                      </div>
+                      <p className="note-detail-meta">
+                        Saved from{" "}
+                        {new Date(note.createdAt).toLocaleTimeString()}
+                      </p>
+                      <div className="note-detail-body">
+                        <h2>{note.title}</h2>
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: note.content,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()
+              ) : (
+                <div className="note-detail-empty">
+                  <p>Select a note to view</p>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -595,6 +595,8 @@
 
 /* ===== BRAIN DUMP ===== */
 .brain-dump-panel {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background-color: var(--surface);
@@ -632,4 +634,348 @@
 
 .brain-dump-textarea::placeholder {
   color: var(--text-hint);
+}
+/* ===== NOTES LAYOUT (3-Column) ===== */
+.notes-layout {
+  grid-template-columns: 220px 0.6fr 1fr;
+  gap: 1.25rem;
+}
+
+/* Left Panel: Folders */
+.notes-folders-panel {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+.folders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.folders-header .panel-label {
+  margin: 0;
+}
+
+.folder-add-btn {
+  background: none;
+  border: none;
+  color: var(--text-hint);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.folder-add-btn:hover {
+  color: var(--text);
+}
+
+.folders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.folder-item {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  position: relative;
+}
+
+.folder-item:hover {
+  border-color: var(--accent);
+  background-color: var(--surface);
+}
+
+.folder-item.active {
+  background-color: var(--surface);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.inbox-folder {
+  background-color: var(--surface);
+  color: var(--text-hint);
+}
+
+.inbox-folder.active {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.folder-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.folder-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-count {
+  background-color: var(--accent);
+  color: var(--surface);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.inbox-folder .folder-count {
+  background-color: var(--text-hint);
+}
+
+.new-folder-btn {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 0.625rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  color: var(--text-hint);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+}
+
+.new-folder-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: var(--surface-2);
+}
+
+/* Middle Panel: Notes List */
+.notes-list-panel {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.notes-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notes-list-header .panel-label {
+  margin: 0;
+  flex: 1;
+}
+
+.notes-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.unsorted-badge {
+  background-color: var(--surface-2);
+  color: var(--text-hint);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.notes-list-action-btn {
+  background: none;
+  border: none;
+  color: var(--text-hint);
+  font-size: 1.125rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.notes-list-action-btn:hover {
+  color: var(--accent);
+}
+
+.notes-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.notes-list-item {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  padding: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notes-list-item:hover {
+  border-color: var(--accent);
+  background-color: var(--surface);
+}
+
+.notes-list-item.active {
+  background-color: var(--surface);
+  border-color: var(--accent);
+}
+
+.notes-list-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.note-tag-indicator {
+  color: var(--accent);
+  font-size: 0.5rem;
+}
+
+.notes-list-item-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notes-list-item-preview {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Right Panel: Note Detail */
+.note-detail-panel {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.note-detail-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.note-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.note-detail-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  flex: 1;
+}
+
+.note-detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.note-detail-action-btn {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--text);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.note-detail-action-btn:hover {
+  background-color: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+}
+
+.note-detail-meta {
+  font-size: 0.75rem;
+  color: var(--text-hint);
+  margin: 0 0 1rem 0;
+}
+
+.note-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.note-detail-body h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 1rem 0;
+}
+
+.note-detail-body p {
+  margin: 0 0 1rem 0;
+}
+
+.note-detail-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-hint);
+  font-size: 0.9375rem;
 }
