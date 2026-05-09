@@ -1,4 +1,4 @@
-import { useState, useEffect, KeyboardEvent } from "react";
+import { useState, useEffect, type KeyboardEvent } from "react";
 import { noteApi } from "../api/client";
 import type { Note } from "../types";
 
@@ -53,7 +53,12 @@ export const CreateNote = ({
       if (isEditMode && note) {
         await noteApi.updateNote(note.id, title, content, selectedFolder, tags);
       } else {
-        await noteApi.createNote(title, content, selectedFolder, tags);
+        await noteApi.createNote(
+          title,
+          content,
+          selectedFolder ?? undefined,
+          tags,
+        );
       }
 
       // Clear form

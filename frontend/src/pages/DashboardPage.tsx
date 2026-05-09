@@ -130,10 +130,6 @@ export const DashboardPage = () => {
     setOpenMenuNoteId(openMenuNoteId === noteId ? null : noteId);
   };
 
-  const handleCreateFolder = () => {
-    setShowCreateFolderModal(true);
-  };
-
   const handleMoveNoteToFolder = async (
     noteId: string,
     folderId: string | null,
