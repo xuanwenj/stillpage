@@ -1,0 +1,91 @@
+/* Confirm dialog — sits inside the shared .modal-overlay */
+.confirm-dialog {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(76, 61, 143, 0.14);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  animation: confirm-in 0.18s ease;
+}
+
+@keyframes confirm-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.confirm-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.confirm-message {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  margin-top: 0.625rem;
+}
+
+.confirm-cancel-btn {
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.4375rem 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.confirm-cancel-btn:hover {
+  background-color: var(--surface-2);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.confirm-ok-btn {
+  background-color: var(--accent);
+  color: #ffffff;
+  padding: 0.4375rem 0.875rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background-color 0.15s;
+}
+
+.confirm-ok-btn:hover {
+  background-color: #3d3176;
+}
+
+.confirm-ok-btn--danger {
+  background-color: #dc2626;
+}
+
+.confirm-ok-btn--danger:hover {
+  background-color: #b91c1c;
+}
