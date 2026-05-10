@@ -10,6 +10,8 @@ interface INote extends Document {
   createdAt: Date;
   updatedAt: Date;
   tags: string[];
+  videoUrl?: string;
+  videoItems?: { time: number; note: string }[];
 }
 
 // Define the schema
@@ -46,6 +48,14 @@ const noteSchema = new Schema<INote>(
     date: {
       type: String,
       index: true,
+    },
+    videoUrl: {
+      type: String,
+      default: null,
+    },
+    videoItems: {
+      type: [{ time: Number, note: String }],
+      default: [],
     },
   },
   {

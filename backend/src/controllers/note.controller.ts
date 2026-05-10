@@ -25,7 +25,7 @@ export const createNote = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { title, content, folderId, tags } = req.body;
+    const { title, content, folderId, tags, videoUrl, videoItems } = req.body;
 
     // Validation
     if (!title || title.trim() === "") {
@@ -55,6 +55,8 @@ export const createNote = async (
       folderId: folderId || null,
       tags: tags ?? [],
       date: new Date().toISOString().slice(0, 10),
+      videoUrl: videoUrl || null,
+      videoItems: videoItems || [],
     });
 
     await note.save();
@@ -172,7 +174,7 @@ export const updateNote = async (
     }
 
     const { id } = req.params as { id: string };
-    const { title, content, folderId, tags } = req.body;
+    const { title, content, folderId, tags, videoUrl, videoItems } = req.body;
 
     // Validate ID format
     if (!id || !Types.ObjectId.isValid(id)) {
@@ -216,7 +218,12 @@ export const updateNote = async (
       }
       note.tags = tags;
     }
-
+    if (videoUrl !== undefined) {
+      note.videoUrl = videoUrl || null;
+    }
+    if (videoItems !== undefined) {
+      note.videoItems = videoItems || [];
+    }
     await note.save();
 
     res.status(200).json({
