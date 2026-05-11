@@ -26,6 +26,8 @@ export type Note = {
   createdAt: string;
   updatedAt: string;
   tags?: string[];
+  videoUrl?: string | null;
+  videoItems?: { time: number; note: string }[];
 };
 
 // Folder types

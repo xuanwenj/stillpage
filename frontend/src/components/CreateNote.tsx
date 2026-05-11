@@ -21,6 +21,10 @@ export const CreateNote = ({
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoItems, setVideoItems] = useState<
+    { time: number; note: string }[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isEditMode = !!note;
@@ -31,11 +35,15 @@ export const CreateNote = ({
       setTitle(note.title);
       setContent(note.content);
       setTags(note.tags ?? []);
+      setVideoUrl(note.videoUrl ?? null);
+      setVideoItems(note.videoItems ?? []);
       setTagInput("");
     } else if (isOpen) {
       setTitle("");
       setContent("");
       setTags([]);
+      setVideoUrl(null);
+      setVideoItems([]);
       setTagInput("");
     }
   }, [isOpen, note]);
@@ -51,13 +59,23 @@ export const CreateNote = ({
       }
 
       if (isEditMode && note) {
-        await noteApi.updateNote(note.id, title, content, selectedFolder, tags);
+        await noteApi.updateNote(
+          note.id,
+          title,
+          content,
+          selectedFolder,
+          tags,
+          videoUrl,
+          videoItems,
+        );
       } else {
         await noteApi.createNote(
           title,
           content,
           selectedFolder ?? undefined,
           tags,
+          videoUrl,
+          videoItems,
         );
       }
 
@@ -66,6 +84,8 @@ export const CreateNote = ({
       setContent("");
       setTags([]);
       setTagInput("");
+      setVideoUrl(null);
+      setVideoItems([]);
 
       // Call parent callback to refresh notes
       onSave();
@@ -82,6 +102,8 @@ export const CreateNote = ({
     setContent("");
     setTags([]);
     setTagInput("");
+    setVideoUrl(null);
+    setVideoItems([]);
     setError(null);
     onClose();
   };

@@ -21,6 +21,17 @@ export const DashboardPage = () => {
   const toast = useToast();
   const confirm = useConfirm();
 
+  // Helper function to format seconds to HH:MM:SS
+  const formatSeconds = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return [hours, minutes, secs]
+      .map((val) => String(val).padStart(2, "0"))
+      .join(":");
+  };
+
   const [notes, setNotes] = useState<Note[]>([]);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -537,7 +548,13 @@ export const DashboardPage = () => {
                         <h3 className="notes-list-item-title">{note.title}</h3>
                       </div>
                       <p className="notes-list-item-preview">
-                        {note.content.replace(/<[^>]*>/g, "").substring(0, 100)}
+                        {note.content
+                          ? note.content
+                              .replace(/<[^>]*>/g, "")
+                              .substring(0, 100)
+                          : note.videoUrl
+                            ? `📹 ${note.videoUrl}`
+                            : "(No content)"}
                       </p>
                     </div>
                   ))}
@@ -565,12 +582,41 @@ export const DashboardPage = () => {
                         {new Date(note.createdAt).toLocaleTimeString()}
                       </p>
                       <div className="note-detail-body">
-                        <h2>{note.title}</h2>
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: note.content,
-                          }}
-                        />
+                        {note.content ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: note.content,
+                            }}
+                          />
+                        ) : (
+                          <p className="note-empty-content">
+                            (No content - only title was saved)
+                          </p>
+                        )}
+                        {note.videoUrl && (
+                          <div className="note-video-info">
+                            <strong>Video:</strong>{" "}
+                            <a
+                              href={note.videoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {note.videoUrl}
+                            </a>
+                            {note.videoItems && note.videoItems.length > 0 && (
+                              <div className="video-items">
+                                <strong>Video Notes:</strong>
+                                <ul>
+                                  {note.videoItems.map((item, idx) => (
+                                    <li key={idx}>
+                                      [{formatSeconds(item.time)}] {item.note}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

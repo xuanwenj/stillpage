@@ -74,12 +74,16 @@ export const noteApi = {
     content: string,
     folderId?: string,
     tags?: string[] | null,
+    videoUrl?: string | null,
+    videoItems?: { time: number; note: string }[] | null,
   ) =>
     apiClient.post<{ message: string; note: Note }>("/notes", {
       title,
       content,
       folderId,
       tags,
+      videoUrl,
+      videoItems,
     }),
 
   updateNote: (
@@ -88,12 +92,16 @@ export const noteApi = {
     content: string,
     folderId?: string | null,
     tags?: string[] | null,
+    videoUrl?: string | null,
+    videoItems?: { time: number; note: string }[] | null,
   ) =>
     apiClient.put<{ message: string; note: Note }>(`/notes/${id}`, {
       title,
       content,
       folderId,
       tags,
+      videoUrl,
+      videoItems,
     }),
 
   deleteNote: (id: string) => apiClient.delete(`/notes/${id}`),
