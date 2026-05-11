@@ -16,7 +16,11 @@ app.use(
   cors({
     origin: process.env.CORS_ORIGIN
       ? process.env.CORS_ORIGIN.split(",")
-      : ["http://localhost:2000", "http://localhost:2001"],
+      : [
+          "http://localhost:2000",
+          "http://localhost:2001",
+          "chrome-extension://bddpaochjacomkcbmihigelnaphnkocc",
+        ],
     credentials: true,
   }),
 );
