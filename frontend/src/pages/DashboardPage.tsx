@@ -307,6 +307,13 @@ export const DashboardPage = () => {
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
+            <button
+              className="sidebar-tab"
+              onClick={() => navigate("/editor-test")}
+              style={{ marginTop: "20px", opacity: 0.7 }}
+            >
+              Editor Test
+            </button>
           </nav>
         </div>
 

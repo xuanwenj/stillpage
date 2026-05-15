@@ -26,7 +26,7 @@ Content-Type: application/json
 ### After you run "Login User" above, copy the token value and paste it below
 ### Example: @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzgzOTg0NTEsImV4cCI6MTc3ODQwMjA1MX0.gr67BP5DWjq7eLs0qLfkjjDF7QaLXpXUWtN9iv9AKTU
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWNmMTRmNTlhNWQyNWMzNmYwZDBjMWMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg4MzgyNzYsImV4cCI6MTc3ODg0MTg3Nn0._RIbe7X7JPkLB6yuRzRTj8Kqr4m6YVGji5K1cgrjYIs
 ### ===== NOTE CRUD TESTS =====
 
 ### Create Note
@@ -35,8 +35,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "title": "My Second Note",
-  "content": "<h1>Hello World</h1>"
+  "title": "tiptap Note",
+  "content": "<h1>this is a note for testing tiptap</h1>"
 }
 
 ### ===== VIDEO PROPERTIES TESTS =====

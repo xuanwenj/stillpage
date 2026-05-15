@@ -19,6 +19,7 @@ app.use(
       : [
           "http://localhost:2000",
           "http://localhost:2001",
+          "http://localhost:2002",
           "chrome-extension://bddpaochjacomkcbmihigelnaphnkocc",
         ],
     credentials: true,
