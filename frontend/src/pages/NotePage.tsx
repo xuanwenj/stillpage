@@ -1,23 +1,38 @@
 import { useState, useEffect } from "react";
-import { noteApi } from "../api/client";
+import { noteApi, folderApi } from "../api/client";
 import { NoteEditor } from "../components/NoteEditor";
 import type { Note, Folder } from "../types";
 import { useToast, useConfirm } from "../toast";
 
-interface NotePageProps {
-  notes: Note[];
-  folders: Folder[];
-  onNotesChange: (notes: Note[]) => void;
-}
-
-export const NotePage = ({ notes, folders, onNotesChange }: NotePageProps) => {
+export const NotePage = () => {
   const toast = useToast();
   const confirm = useConfirm();
+
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
 
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [editingContent, setEditingContent] = useState("");
+
+  // Fetch notes and folders on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [notesResponse, foldersResponse] = await Promise.all([
+          noteApi.getNotes(),
+          folderApi.getFolders(),
+        ]);
+        setNotes(notesResponse.data);
+        setFolders(foldersResponse.data);
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+        toast.error("Failed to load notes. Please try again.");
+      }
+    };
+    fetchData();
+  }, []);
 
   // Update editing state when selected note changes
   useEffect(() => {
@@ -40,7 +55,7 @@ export const NotePage = ({ notes, folders, onNotesChange }: NotePageProps) => {
     if (ok) {
       try {
         await noteApi.deleteNote(noteId);
-        onNotesChange(notes.filter((note) => note.id !== noteId));
+        setNotes(notes.filter((note) => note.id !== noteId));
         setSelectedNoteId(null);
         toast.success("Note deleted.");
       } catch (err) {
@@ -56,7 +71,7 @@ export const NotePage = ({ notes, folders, onNotesChange }: NotePageProps) => {
   ) => {
     try {
       await noteApi.moveNoteToFolder(noteId, folderId);
-      onNotesChange(
+      setNotes(
         notes.map((note) =>
           note.id === noteId ? ({ ...note, folderId } as Note) : note,
         ),
@@ -87,8 +102,8 @@ export const NotePage = ({ notes, folders, onNotesChange }: NotePageProps) => {
         note.videoItems,
       );
 
-      // Update the notes in parent
-      onNotesChange(
+      // Update the notes in state
+      setNotes(
         notes.map((n) =>
           n.id === selectedNoteId
             ? { ...n, title: editingTitle, content: editingContent }
@@ -187,7 +202,7 @@ export const NotePage = ({ notes, folders, onNotesChange }: NotePageProps) => {
             ))}
         </div>
       </div>
-      Right: Note Detail - with Editor
+
       <div className="note-detail-panel">
         {selectedNoteId && notes.find((n) => n.id === selectedNoteId) ? (
           (() => {

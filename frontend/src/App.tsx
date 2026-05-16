@@ -9,7 +9,6 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
-import { WeekReviewPage } from "./pages/WeekReviewPage";
 import { ToastProvider } from "./toast";
 import { ConfirmProvider } from "./toast";
 import "./styles/modal.css";
@@ -34,12 +33,7 @@ function App() {
                   <DashboardPage />
                 </ProtectedRoute>
               }
-            >
-              <Route index element={<Navigate to="daily" replace />} />
-              <Route path="daily" element={<div>Daily View Coming Soon</div>} />
-              <Route path="notes" element={<div>Notes View Coming Soon</div>} />
-              <Route path="review" element={<WeekReviewPage />} />
-            </Route>
+            />
 
             {/* Default redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
