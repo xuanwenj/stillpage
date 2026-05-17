@@ -11,7 +11,7 @@ interface NoteEditorProps {
   };
   onTitleChange: (title: string) => void;
   onContentChange: (content: string) => void;
-  onSave: () => void;
+  //onSave: () => void;
   initialTitle: string;
 }
 
@@ -19,7 +19,7 @@ export const NoteEditor = ({
   note,
   onContentChange,
   onTitleChange,
-  onSave,
+  //  onSave,
   initialTitle,
 }: NoteEditorProps) => {
   const [title, setTitle] = useState(initialTitle || note.title);
@@ -34,6 +34,7 @@ export const NoteEditor = ({
       StarterKit.configure({
         blockquote: false,
         codeBlock: false,
+        underline: false,
       }),
       Underline,
       Image.configure({
@@ -48,7 +49,7 @@ export const NoteEditor = ({
   });
 
   if (!editor) {
-    return <div style={{ padding: "20px" }}>Loading editor...</div>;
+    return <div className="note-editor">Loading editor...</div>;
   }
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,55 +59,38 @@ export const NoteEditor = ({
   };
 
   return (
-    <div style={{ fontFamily: "system-ui" }}>
+    <div className="note-editor">
       {/* Title Input */}
       <input
         type="text"
         value={title}
         onChange={handleTitleChange}
         placeholder="Note title..."
-        style={{
-          width: "100%",
-          fontSize: "18px",
-          fontWeight: "bold",
-          marginBottom: "15px",
-          padding: "8px",
-          border: "none",
-          borderBottom: "1px solid #ddd",
-          outline: "none",
-        }}
+        className="note-editor-title"
       />
 
       {/* Toolbar */}
-      <div
-        style={{
-          marginBottom: "10px",
-          display: "flex",
-          gap: "5px",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="note-editor-toolbar">
         <button
+          className={`toolbar-btn ${editor.isActive("bold") ? "active" : ""}`}
           onClick={() => editor.chain().focus().toggleBold().run()}
-          style={{ fontWeight: editor.isActive("bold") ? "bold" : "normal" }}
         >
           Bold
         </button>
         <button
+          className={`toolbar-btn ${editor.isActive("italic") ? "active" : ""}`}
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          style={{ fontStyle: editor.isActive("italic") ? "italic" : "normal" }}
         >
           Italic
         </button>
         <button
+          className={`toolbar-btn ${editor.isActive("underline") ? "active" : ""}`}
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          style={{
-            textDecoration: editor.isActive("underline") ? "underline" : "none",
-          }}
         >
           Underline
         </button>
         <button
+          className={`toolbar-btn ${editor.isActive("heading", { level: 1 }) ? "active" : ""}`}
           onClick={() =>
             editor.chain().focus().toggleHeading({ level: 1 }).run()
           }
@@ -114,16 +98,21 @@ export const NoteEditor = ({
           H1
         </button>
         <button
+          className={`toolbar-btn ${editor.isActive("heading", { level: 2 }) ? "active" : ""}`}
           onClick={() =>
             editor.chain().focus().toggleHeading({ level: 2 }).run()
           }
         >
           H2
         </button>
-        <button onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <button
+          className={`toolbar-btn ${editor.isActive("bulletList") ? "active" : ""}`}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+        >
           List
         </button>
         <button
+          className="toolbar-btn"
           onClick={() =>
             editor
               .chain()
@@ -137,33 +126,9 @@ export const NoteEditor = ({
       </div>
 
       {/* Editor */}
-      <div
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          minHeight: "300px",
-          padding: "10px",
-          marginBottom: "15px",
-        }}
-      >
+      <div className="note-editor-content">
         <EditorContent editor={editor} />
       </div>
-
-      {/* Save Button */}
-      <button
-        onClick={onSave}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer",
-          fontSize: "14px",
-        }}
-      >
-        Save
-      </button>
     </div>
   );
 };
