@@ -69,6 +69,7 @@ export const createNote = async (
       videoUrl: videoUrl || null,
       videoItems: videoItems || [],
     });
+    console.log("req.body:", req.body);
 
     await note.save();
 
