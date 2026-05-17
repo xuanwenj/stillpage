@@ -46,12 +46,23 @@ export const createNote = async (
           .json({ message: "Each tag must be a non-empty string" });
       }
     }
-
+    const formatTime = (seconds: number): string => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, "0")}`;
+    };
     // Create note
     const note = new Note({
       userId,
       title: title.trim(),
-      content: content || "",
+      content:
+        content ||
+        `<p>${videoUrl}</p>` +
+          videoItems
+            .map(
+              (item: any) => `<p>${formatTime(item.time)} - ${item.note}</p>`,
+            )
+            .join(""),
       folderId: folderId || null,
       tags: tags ?? [],
       date: new Date().toISOString().slice(0, 10),

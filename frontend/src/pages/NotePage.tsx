@@ -174,7 +174,6 @@ export const NotePage = () => {
               }{" "}
               unsorted
             </span>
-            <button className="notes-list-action-btn">+</button>
           </div>
         </div>
         <div className="notes-list-container">
