@@ -211,8 +211,19 @@ export const NotePage = () => {
         {selectedNoteId && notes.find((n) => n.id === selectedNoteId) ? (
           (() => {
             const note = notes.find((n) => n.id === selectedNoteId)!;
+            const videoId = note.videoUrl
+              ? new URL(note.videoUrl).searchParams.get("v")
+              : null;
             return (
               <div className="note-detail-editor-wrapper">
+                {videoId && (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${videoId}`}
+                    width="100%"
+                    height="315"
+                    allowFullScreen
+                  />
+                )}
                 <NoteEditor
                   key={note.id}
                   note={note}
