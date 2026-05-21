@@ -1,17 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { DailyPage } from "./DailyPage";
-import { NotePage } from "./NotePage";
-import { WeekReviewPage } from "./WeekReviewPage";
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-
-  const [activeTab, setActiveTab] = useState<"daily" | "review" | "notes">(
-    "daily",
-  );
 
   const handleLogout = () => {
     logout();
@@ -36,28 +28,18 @@ export const DashboardPage = () => {
         {/* Sidebar */}
         <div className="dashboard-sidebar">
           <nav className="sidebar-nav">
-            {(["daily", "review", "notes"] as const).map((tab) => (
-              <button
-                key={tab}
-                className={`sidebar-tab ${activeTab === tab ? "active" : ""}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
+            <Link to="/dashboard/daily" className="sidebar-tab">
+              Daily
+            </Link>
+            <Link to="/dashboard/review" className="sidebar-tab">
+              Review
+            </Link>
+            <Link to="/dashboard/notes" className="sidebar-tab">
+              Notes
+            </Link>
           </nav>
         </div>
-
-        {/* Content Area - Tab View */}
-        {activeTab === "daily" && <DailyPage />}
-
-        {activeTab === "review" && (
-          <div className="dashboard-main tab-view">
-            <WeekReviewPage />
-          </div>
-        )}
-
-        {activeTab === "notes" && <NotePage />}
+        <Outlet />
       </div>
     </div>
   );
