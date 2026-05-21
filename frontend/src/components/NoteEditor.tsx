@@ -11,7 +11,6 @@ interface NoteEditorProps {
   };
   onTitleChange: (title: string) => void;
   onContentChange: (content: string) => void;
-  //onSave: () => void;
   initialTitle: string;
 }
 
