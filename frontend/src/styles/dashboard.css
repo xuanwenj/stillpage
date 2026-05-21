@@ -897,6 +897,44 @@
   overflow: hidden;
 }
 
+.note-detail-video {
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+}
+
+.note-detail-scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.note-detail-scrollable-content .note-editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.note-detail-scrollable-content .note-editor-title {
+  position: sticky;
+  top: 0;
+  background-color: var(--surface);
+  z-index: 10;
+  padding-bottom: 0.5rem;
+}
+
+.note-detail-scrollable-content .note-editor-toolbar {
+  position: sticky;
+  top: 2rem;
+  background-color: var(--surface-2);
+  z-index: 10;
+  padding: 0.5rem 0;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.note-detail-scrollable-content .note-editor-content {
+  flex: 1;
+}
+
 .note-detail-content {
   display: flex;
   flex-direction: column;
@@ -922,10 +960,22 @@
   flex: 1;
 }
 
+.note-detail-editor-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .note-detail-actions {
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }
 
 .note-detail-action-btn {

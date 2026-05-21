@@ -215,22 +215,31 @@ export const NotePage = () => {
               ? new URL(note.videoUrl).searchParams.get("v")
               : null;
             return (
-              <div className="note-detail-editor-wrapper">
+              <>
+                {/* Fixed Video */}
                 {videoId && (
-                  <iframe
-                    src={`https://www.youtube.com/embed/${videoId}`}
-                    width="100%"
-                    height="315"
-                    allowFullScreen
-                  />
+                  <div className="note-detail-video">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${videoId}`}
+                      width="100%"
+                      height="215"
+                      allowFullScreen
+                    />
+                  </div>
                 )}
-                <NoteEditor
-                  key={note.id}
-                  note={note}
-                  onTitleChange={setEditingTitle}
-                  onContentChange={setEditingContent}
-                  initialTitle={editingTitle}
-                />
+
+                {/* Scrollable Content with Sticky Title & Toolbar */}
+                <div className="note-detail-scrollable-content">
+                  <NoteEditor
+                    key={note.id}
+                    note={note}
+                    onTitleChange={setEditingTitle}
+                    onContentChange={setEditingContent}
+                    initialTitle={editingTitle}
+                  />
+                </div>
+
+                {/* Fixed Actions */}
                 <div className="note-detail-actions">
                   <button
                     onClick={handleSaveNote}
@@ -276,7 +285,7 @@ export const NotePage = () => {
                     Delete
                   </button>
                 </div>
-              </div>
+              </>
             );
           })()
         ) : (
