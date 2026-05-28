@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { todoApi, brainDumpApi, reviewApi } from "../api/client";
+import { todoApi, brainDumpApi } from "../api/client";
 import { CreateTodo } from "../components/CreateTodo";
 import type { Todo, BrainDump } from "../types";
 import { useToast, useConfirm } from "../toast";
+import { FocusTimer } from "../components/FocusTimer";
 
 export const DailyPage = () => {
   const toast = useToast();
@@ -14,8 +15,6 @@ export const DailyPage = () => {
   const [brainDump, setBrainDump] = useState<BrainDump | null>(null);
   const [brainDumpContent, setBrainDumpContent] = useState("");
   const [brainDumpSaving, setBrainDumpSaving] = useState(false);
-  const [reviewSummary, setReviewSummary] = useState("");
-  const [reviewLoading, setReviewLoading] = useState(false);
   const [clockTime, setClockTime] = useState(() => {
     const now = new Date();
     return now.toLocaleTimeString("en-US", {
@@ -116,21 +115,6 @@ export const DailyPage = () => {
       console.error("Failed to save brain dump:", err);
     } finally {
       setBrainDumpSaving(false);
-    }
-  };
-
-  const handleReview = async () => {
-    setReviewLoading(true);
-    try {
-      const res = await reviewApi.performReview();
-      setReviewSummary(res.data.summary);
-      await fetchData();
-      toast.success("Review completed.");
-    } catch (err) {
-      console.error("Review error:", err);
-      toast.error("Failed to perform the review. Please try again.");
-    } finally {
-      setReviewLoading(false);
     }
   };
 
@@ -280,18 +264,9 @@ export const DailyPage = () => {
           <div className="clock-time">{clockTime}</div>
           <div className="clock-day">{clockDay}</div>
         </div>
-
-        {/* Today's Review */}
-        <div className="panel-card review-card">
-          <button
-            className="panel-label review-btn"
-            onClick={handleReview}
-            disabled={reviewLoading}
-          >
-            {reviewLoading ? "Generating..." : "Today's Review"}
-          </button>
-          {reviewSummary && <p className="review-summary">{reviewSummary}</p>}
-        </div>
+        <div className="timer-card"></div>
+        <p className="focus-timer">Focus</p>
+        <FocusTimer />
       </div>
 
       {/* Modals */}

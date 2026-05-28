@@ -16,6 +16,7 @@ export const NotePage = () => {
   const [editingTitle, setEditingTitle] = useState("");
   const [editingContent, setEditingContent] = useState("");
   const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [showNoteEditor, setShowNoteEditor] = useState(false);
   const handleSelectNote = (id: string) => {
     setSelectedNoteId(id);
     const note = notes.find((n) => n.id === id);
@@ -41,6 +42,9 @@ export const NotePage = () => {
   useEffect(() => {
     fetchData();
   }, []);
+  const handleCreateNote = () => {
+    setShowNoteEditor(true);
+  };
 
   const handleDeleteNote = async (noteId: string) => {
     const ok = await confirm({
@@ -88,34 +92,34 @@ export const NotePage = () => {
   };
 
   const handleSaveNote = async () => {
-    if (!selectedNoteId) return;
-
-    const note = notes.find((n) => n.id === selectedNoteId);
-    if (!note) return;
-
     try {
-      await noteApi.updateNote(
-        selectedNoteId,
-        editingTitle,
-        editingContent,
-        note.folderId,
-        note.tags,
-        note.videoUrl,
-        note.videoItems,
-      );
-
-      // Update the notes in state
-      setNotes(
-        notes.map((n) =>
-          n.id === selectedNoteId
-            ? { ...n, title: editingTitle, content: editingContent }
-            : n,
-        ),
-      );
+      if (showNoteEditor) {
+        await noteApi.createNote(
+          editingTitle,
+          editingContent,
+          selectedFolderId || undefined,
+        );
+        setShowNoteEditor(false);
+        setEditingTitle("");
+        setEditingContent("");
+        fetchData();
+        toast.success("Note created.");
+      } else if (selectedNoteId) {
+        const note = notes.find((n) => n.id === selectedNoteId);
+        if (!note) return;
+        await noteApi.updateNote(
+          selectedNoteId,
+          editingTitle,
+          editingContent,
+          note.folderId,
+        );
+        fetchData();
+        toast.success("Note updated.");
+      }
     } catch (err) {
-      console.error("Failed to autosave note:", err);
+      console.error("Failed to save note:", err);
+      toast.error("Failed to save the note. Please try again.");
     }
-    toast.success("Note saved.");
   };
 
   return (
@@ -124,7 +128,9 @@ export const NotePage = () => {
       <div className="notes-folders-panel">
         <div className="folders-header">
           <h2 className="panel-label">NOTES</h2>
-          <button className="folder-add-btn">+</button>
+          <button className="folder-add-btn" onClick={handleCreateNote}>
+            +
+          </button>
         </div>
         <div className="folders-list">
           <button
@@ -208,58 +214,79 @@ export const NotePage = () => {
       </div>
 
       <div className="note-detail-panel">
-        {selectedNoteId && notes.find((n) => n.id === selectedNoteId) ? (
-          (() => {
-            const note = notes.find((n) => n.id === selectedNoteId)!;
-            const videoId = note.videoUrl
-              ? new URL(note.videoUrl).searchParams.get("v")
-              : null;
-            return (
-              <>
-                {/* Fixed Video */}
-                {videoId && (
-                  <div className="note-detail-video">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${videoId}`}
-                      width="100%"
-                      height="215"
-                      allowFullScreen
-                    />
-                  </div>
-                )}
+        {showNoteEditor || selectedNoteId ? (
+          <>
+            {showNoteEditor ? (
+              <div className="note-detail-scrollable-content">
+                <NoteEditor
+                  note={{ title: "", content: "" }}
+                  onTitleChange={setEditingTitle}
+                  onContentChange={setEditingContent}
+                  initialTitle={editingTitle}
+                />
+              </div>
+            ) : (
+              (() => {
+                const note = notes.find((n) => n.id === selectedNoteId)!;
+                const videoId = note.videoUrl
+                  ? new URL(note.videoUrl).searchParams.get("v")
+                  : null;
+                return (
+                  <>
+                    {/* Fixed Video */}
+                    {videoId && (
+                      <div className="note-detail-video">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${videoId}`}
+                          width="100%"
+                          height="215"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                    {/* Scrollable Content with Sticky Title & Toolbar */}
+                    <div className="note-detail-scrollable-content">
+                      <NoteEditor
+                        key={note.id}
+                        note={note}
+                        onTitleChange={setEditingTitle}
+                        onContentChange={setEditingContent}
+                        initialTitle={editingTitle}
+                      />
+                    </div>
+                  </>
+                );
+              })()
+            )}
 
-                {/* Scrollable Content with Sticky Title & Toolbar */}
-                <div className="note-detail-scrollable-content">
-                  <NoteEditor
-                    key={note.id}
-                    note={note}
-                    onTitleChange={setEditingTitle}
-                    onContentChange={setEditingContent}
-                    initialTitle={editingTitle}
-                  />
-                </div>
-
-                {/* Fixed Actions */}
-                <div className="note-detail-actions">
-                  <button
-                    onClick={handleSaveNote}
-                    style={{
-                      padding: "10px 20px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Save
-                  </button>
+            {/* Fixed Actions */}
+            <div className="note-detail-actions">
+              <button
+                onClick={handleSaveNote}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+              >
+                Save
+              </button>
+              {selectedNoteId && (
+                <>
                   <select
                     className="note-detail-folder-select"
-                    value={note.folderId || ""}
+                    value={
+                      notes.find((n) => n.id === selectedNoteId)?.folderId || ""
+                    }
                     onChange={(e) =>
-                      handleMoveNoteToFolder(note.id, e.target.value || null)
+                      handleMoveNoteToFolder(
+                        selectedNoteId,
+                        e.target.value || null,
+                      )
                     }
                   >
                     {folders.map((folder) => (
@@ -271,7 +298,7 @@ export const NotePage = () => {
                   </select>
                   <button
                     className="note-detail-action-btn danger"
-                    onClick={() => handleDeleteNote(note.id)}
+                    onClick={() => handleDeleteNote(selectedNoteId)}
                     style={{
                       padding: "10px 20px",
                       backgroundColor: "#972205",
@@ -284,10 +311,10 @@ export const NotePage = () => {
                   >
                     Delete
                   </button>
-                </div>
-              </>
-            );
-          })()
+                </>
+              )}
+            </div>
+          </>
         ) : (
           <div className="note-detail-empty">
             <p>Select a note to view and edit</p>

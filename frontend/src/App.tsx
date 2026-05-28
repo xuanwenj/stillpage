@@ -13,7 +13,6 @@ import { ToastProvider } from "./toast";
 import { ConfirmProvider } from "./toast";
 import "./styles/modal.css";
 import { NotePage } from "./pages/NotePage";
-import { WeekReviewPage } from "./pages/WeekReviewPage";
 import { DailyPage } from "./pages/DailyPage";
 
 function App() {
@@ -39,7 +38,6 @@ function App() {
             >
               <Route index element={<Navigate to="daily" replace />} />
               <Route path="daily" element={<DailyPage />} />
-              <Route path="review" element={<WeekReviewPage />} />
               <Route path="notes" element={<NotePage />} />
             </Route>
 

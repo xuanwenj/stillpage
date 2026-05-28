@@ -31,9 +31,6 @@ export const DashboardPage = () => {
             <Link to="/dashboard/daily" className="sidebar-tab">
               Daily
             </Link>
-            <Link to="/dashboard/review" className="sidebar-tab">
-              Review
-            </Link>
             <Link to="/dashboard/notes" className="sidebar-tab">
               Notes
             </Link>

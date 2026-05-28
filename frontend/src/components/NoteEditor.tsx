@@ -18,7 +18,6 @@ export const NoteEditor = ({
   note,
   onContentChange,
   onTitleChange,
-  //  onSave,
   initialTitle,
 }: NoteEditorProps) => {
   const [title, setTitle] = useState(initialTitle || note.title);

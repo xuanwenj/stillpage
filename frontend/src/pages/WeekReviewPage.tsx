@@ -1,6 +1,6 @@
 import "../styles/weekreview.css";
 import { useEffect, useState } from "react";
-import apiClient, { reviewApi } from "../api/client";
+import apiClient from "../api/client";
 import { useToast } from "../toast";
 const getWeekRangeString = (start: Date, end: Date) => {
   const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
@@ -94,60 +94,6 @@ export const WeekReviewPage = () => {
           </div>
           {loading && <div className="wr-loading">Loading...</div>}
         </div>
-
-        {/* Tags */}
-        {/* <div className="wr-card">
-          <span className="wr-section-label">Tags this week</span>
-          {TAGS.length > 0 ? (
-            <div className="wr-tags">
-              {TAGS.map((t) => (
-                <span key={t} className="wr-tag">
-                  {t}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="wr-empty">No tags yet.</p>
-          )}
-        </div> */}
-
-        {/* Past reviews
-        <div className="wr-card wr-card--grow">
-          <span className="wr-section-label">Past reviews</span>
-          <div className="wr-past-list">
-            {PAST_REVIEWS.map((r) => (
-              <div key={r.range} className="wr-past-item">
-                <div>
-                  <div className="wr-past-range">{r.range}</div>
-                  <div className="wr-past-generated">{r.generated}</div>
-                </div>
-                <button className="wr-view-btn">View</button>
-              </div>
-            ))}
-          </div>
-        </div> */}
-
-        {/* Generate button */}
-        <button
-          className="wr-generate-btn"
-          disabled={generating}
-          onClick={async () => {
-            setGenerating(true);
-            try {
-              const res = await reviewApi.performWeekReview();
-              setSummary(res.data.summary);
-              toast.success("Weekly review generated.");
-            } catch {
-              toast.error(
-                "Failed to generate weekly review. Please try again.",
-              );
-            } finally {
-              setGenerating(false);
-            }
-          }}
-        >
-          {generating ? "Generating…" : "Generate this week's review ↗"}
-        </button>
       </div>
 
       {/* ── Right panel ── */}
