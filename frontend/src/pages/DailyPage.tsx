@@ -265,7 +265,6 @@ export const DailyPage = () => {
           <div className="clock-day">{clockDay}</div>
         </div>
         <div className="timer-card"></div>
-        <p className="focus-timer">Focus</p>
         <FocusTimer />
       </div>
 
