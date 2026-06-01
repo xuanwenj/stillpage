@@ -134,9 +134,14 @@ export const todoApi = {
     return { data: response.data.todos };
   },
 
-  createTodo: (content: string, noteId?: string | null) =>
+  createTodo: (
+    content: string,
+    status: "today" | "upcoming",
+    noteId?: string | null,
+  ) =>
     apiClient.post<{ message: string; todo: Todo }>("/todos", {
       content,
+      status,
       noteId,
     }),
 

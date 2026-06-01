@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { todoApi, brainDumpApi } from "../api/client";
 import { CreateTodo } from "../components/CreateTodo";
+import { CheckedIcon, UncheckedIcon } from "../components/TodoIcons";
 import type { Todo, BrainDump } from "../types";
 import { useToast, useConfirm } from "../toast";
 import { FocusTimer } from "../components/FocusTimer";
@@ -8,13 +9,18 @@ import { FocusTimer } from "../components/FocusTimer";
 export const DailyPage = () => {
   const toast = useToast();
   const confirm = useConfirm();
-
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [status, setStatus] = useState<"today" | "upcoming">("today");
+  const [currentTodos, setCurrentTodos] = useState<Todo[]>([]);
+  const [upcomingTodos, setUpcomingTodos] = useState<Todo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateTodoModal, setShowCreateTodoModal] = useState(false);
   const [brainDump, setBrainDump] = useState<BrainDump | null>(null);
   const [brainDumpContent, setBrainDumpContent] = useState("");
   const [brainDumpSaving, setBrainDumpSaving] = useState(false);
+  const [createStatus, setCreateStatus] = useState<"today" | "upcoming">(
+    "today",
+  );
+
   const [clockTime, setClockTime] = useState(() => {
     const now = new Date();
     return now.toLocaleTimeString("en-US", {
@@ -52,8 +58,12 @@ export const DailyPage = () => {
         todoApi.getAllTodos(),
         brainDumpApi.get(),
       ]);
-
-      setTodos(todosResponse.data);
+      setCurrentTodos(
+        todosResponse.data.filter((todo) => todo.status === "today"),
+      );
+      setUpcomingTodos(
+        todosResponse.data.filter((todo) => todo.status === "upcoming"),
+      );
       setBrainDump(brainDumpResponse.data.entry);
       setBrainDumpContent(brainDumpResponse.data.entry?.content ?? "");
     } catch (err) {
@@ -79,7 +89,8 @@ export const DailyPage = () => {
     if (ok) {
       try {
         await todoApi.deleteTodo(todoId);
-        setTodos((prev) => prev.filter((t) => t.id !== todoId));
+        setCurrentTodos((prev) => prev.filter((t) => t.id !== todoId));
+        setUpcomingTodos((prev) => prev.filter((t) => t.id !== todoId));
         toast.success("Todo deleted.");
       } catch (err) {
         console.error("Failed to delete todo:", err);
@@ -87,17 +98,24 @@ export const DailyPage = () => {
       }
     }
   };
+  const handleCreateTodayTodo = () => {
+    setCreateStatus("today");
+    setShowCreateTodoModal(true);
+  };
 
-  const handleCreateTodo = () => {
+  const handleCreateUpcomingTodo = () => {
+    setCreateStatus("upcoming");
     setShowCreateTodoModal(true);
   };
 
   const handleCompletedChange = async (todoId: string) => {
-    const todo = todos.find((t) => t.id === todoId);
+    const todo =
+      todayTodos.find((t) => t.id === todoId) ||
+      upcomingTodos.find((t) => t.id === todoId);
     if (!todo) return;
     const newCompleted = !todo.completed;
     await todoApi.updateTodo(todoId, undefined, newCompleted);
-    setTodos((prev) =>
+    setCurrentTodos((prev) =>
       prev.map((t) =>
         t.id === todoId ? { ...t, completed: newCompleted } : t,
       ),
@@ -126,9 +144,9 @@ export const DailyPage = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const todayTodos = todos.filter((t) => t.date === todayString());
-  const pendingTodos = todos.filter(
-    (t) => t.date !== todayString() && !t.completed,
+  const todayTodos = currentTodos.filter((t) => t.status === "today");
+  const pendingTodos = upcomingTodos.filter(
+    (t) => t.status === "upcoming" && !t.completed,
   );
 
   return (
@@ -173,37 +191,7 @@ export const DailyPage = () => {
                           todo.completed ? "Mark incomplete" : "Mark complete"
                         }
                       >
-                        {todo.completed ? (
-                          <svg
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <circle cx="10" cy="10" r="10" />
-                            <path
-                              d="M6 10.5l2.5 2.5 5.5-5.5"
-                              stroke="white"
-                              strokeWidth="1.75"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              fill="none"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <circle
-                              cx="10"
-                              cy="10"
-                              r="9"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                            />
-                          </svg>
-                        )}
+                        {todo.completed ? <CheckedIcon /> : <UncheckedIcon />}
                       </button>
                       <span
                         className={`todo-title ${todo.completed ? "completed" : ""}`}
@@ -225,7 +213,10 @@ export const DailyPage = () => {
             )}
             <div className="todo-section">
               {!isLoading && (
-                <button className="new-item-button" onClick={handleCreateTodo}>
+                <button
+                  className="new-item-button"
+                  onClick={handleCreateTodayTodo}
+                >
                   + New todo
                 </button>
               )}
@@ -249,6 +240,12 @@ export const DailyPage = () => {
                   </div>
                 ))
               )}
+              <button
+                className="new-item-button"
+                onClick={handleCreateUpcomingTodo}
+              >
+                + New todo
+              </button>
             </div>
             {todayTodos.length === 0 && (
               <p className="panel-empty">No todos for today</p>
@@ -271,6 +268,7 @@ export const DailyPage = () => {
       {/* Modals */}
       <CreateTodo
         isOpen={showCreateTodoModal}
+        status={createStatus}
         onClose={() => setShowCreateTodoModal(false)}
         onSave={() => {
           setShowCreateTodoModal(false);

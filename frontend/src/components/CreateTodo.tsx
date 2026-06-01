@@ -4,10 +4,16 @@ import { todoApi } from "../api/client";
 interface CreateTodoProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (content: string) => void;
+  onSave: (content: string, status: "today" | "upcoming") => void;
+  status: "today" | "upcoming";
 }
 
-export const CreateTodo = ({ isOpen, onClose, onSave }: CreateTodoProps) => {
+export const CreateTodo = ({
+  isOpen,
+  onClose,
+  onSave,
+  status,
+}: CreateTodoProps) => {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,9 +27,9 @@ export const CreateTodo = ({ isOpen, onClose, onSave }: CreateTodoProps) => {
     try {
       setIsLoading(true);
       setError(null);
-      await todoApi.createTodo(content);
+      await todoApi.createTodo(content, status);
       setContent("");
-      onSave(content);
+      onSave(content, status);
       onClose();
     } catch (err) {
       console.error("Failed to create todo:", err);

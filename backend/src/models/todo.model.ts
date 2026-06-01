@@ -10,6 +10,7 @@ interface ITodo extends Document {
   date: string;
   createdAt: Date;
   updatedAt: Date;
+  status: "today" | "completed" | "upcoming";
 }
 
 // Define the schema
@@ -46,6 +47,12 @@ const todoSchema = new Schema<ITodo>(
     },
     date: {
       type: String,
+      index: true,
+    },
+    status: {
+      type: String,
+      enum: ["today", "completed", "upcoming"],
+      default: "today",
       index: true,
     },
   },
