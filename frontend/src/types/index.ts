@@ -64,5 +64,5 @@ export type Todo = {
   date?: string;
   createdAt: string;
   updatedAt: string;
-  status: "today" | "upcoming" | "completed";
+  status: "today" | "upcoming";
 };

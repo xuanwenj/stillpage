@@ -133,11 +133,7 @@ export const updateTodo = async (
     }
 
     if (status !== undefined) {
-      if (
-        status !== "today" &&
-        status !== "upcoming" &&
-        status !== "completed"
-      ) {
+      if (status !== "today" && status !== "upcoming") {
         return res.status(400).json({ message: "Invalid status" });
       }
       todo.status = status;
