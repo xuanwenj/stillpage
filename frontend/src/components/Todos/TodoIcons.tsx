@@ -1,0 +1,23 @@
+export const CheckedIcon = () => (
+  <svg
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="10" cy="10" r="10" />
+    <path
+      d="M6 10.5l2.5 2.5 5.5-5.5"
+      stroke="white"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </svg>
+);
+
+export const UncheckedIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+);

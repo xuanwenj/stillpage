@@ -145,10 +145,16 @@ export const todoApi = {
       noteId,
     }),
 
-  updateTodo: (id: string, content?: string, completed?: boolean) =>
+  updateTodo: (
+    id: string,
+    content?: string,
+    completed?: boolean,
+    status?: "today" | "upcoming",
+  ) =>
     apiClient.put<{ message: string; todo: Todo }>(`/todos/${id}`, {
       content,
       completed,
+      status,
     }),
 
   deleteTodo: (id: string) => apiClient.delete(`/todos/${id}`),

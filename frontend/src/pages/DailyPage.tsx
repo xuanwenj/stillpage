@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { todoApi, brainDumpApi } from "../api/client";
 import { CreateTodo } from "../components/CreateTodo";
-import { CheckedIcon, UncheckedIcon } from "../components/TodoIcons";
+import { TodoPanel } from "../components/Todos/TodoPanel";
 import type { Todo, BrainDump } from "../types";
 import { useToast, useConfirm } from "../toast";
 import { FocusTimer } from "../components/FocusTimer";
@@ -9,7 +9,6 @@ import { FocusTimer } from "../components/FocusTimer";
 export const DailyPage = () => {
   const toast = useToast();
   const confirm = useConfirm();
-  const [status, setStatus] = useState<"today" | "upcoming">("today");
   const [currentTodos, setCurrentTodos] = useState<Todo[]>([]);
   const [upcomingTodos, setUpcomingTodos] = useState<Todo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -166,87 +165,16 @@ export const DailyPage = () => {
       </div>
 
       {/* Todos Panel */}
-      <div className="panel">
-        <h2 className="panel-label">TODOS</h2>
-        {isLoading ? (
-          <p className="panel-empty">Loading...</p>
-        ) : (
-          <>
-            {todayTodos.length > 0 && (
-              <div className="todo-section">
-                <h3 className="todo-section-label">Today</h3>
-                {todayTodos.map((todo) => (
-                  <div key={todo.id} className="todo-item">
-                    <div className="todo-content">
-                      <button
-                        className={`todo-circle-btn ${todo.completed ? "checked" : ""}`}
-                        onClick={() => handleCompletedChange(todo.id)}
-                        aria-label={
-                          todo.completed ? "Mark incomplete" : "Mark complete"
-                        }
-                      >
-                        {todo.completed ? <CheckedIcon /> : <UncheckedIcon />}
-                      </button>
-                      <span
-                        className={`todo-title ${todo.completed ? "completed" : ""}`}
-                      >
-                        {todo.content}
-                      </span>
-                    </div>
-                    <div className="todo-actions">
-                      <button
-                        className="todo-delete-btn"
-                        onClick={() => handleDeleteTodo(todo.id)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="todo-section">
-              {!isLoading && (
-                <button
-                  className="new-item-button"
-                  onClick={handleCreateTodayTodo}
-                >
-                  + New todo
-                </button>
-              )}
-              <h3 className="todo-section-label">Upcoming</h3>
-              {pendingTodos.length === 0 ? (
-                <p className="panel-empty">Nothing upcoming</p>
-              ) : (
-                pendingTodos.map((todo) => (
-                  <div key={todo.id} className="todo-item">
-                    <div className="todo-content">
-                      <span className="todo-title">{todo.content}</span>
-                    </div>
-                    <div className="todo-actions">
-                      <button
-                        className="todo-delete-btn"
-                        onClick={() => handleDeleteTodo(todo.id)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-              <button
-                className="new-item-button"
-                onClick={handleCreateUpcomingTodo}
-              >
-                + New todo
-              </button>
-            </div>
-            {todayTodos.length === 0 && (
-              <p className="panel-empty">No todos for today</p>
-            )}
-          </>
-        )}
-      </div>
+      <TodoPanel
+        isLoading={isLoading}
+        todayTodos={todayTodos}
+        upcomingTodos={pendingTodos}
+        onTodoCompleted={handleCompletedChange}
+        onTodoDeleted={handleDeleteTodo}
+        onCreateTodayTodo={handleCreateTodayTodo}
+        onCreateUpcomingTodo={handleCreateUpcomingTodo}
+        onRefresh={fetchData}
+      />
 
       {/* Right Panel */}
       <div className="right-panel">
@@ -255,8 +183,9 @@ export const DailyPage = () => {
           <div className="clock-time">{clockTime}</div>
           <div className="clock-day">{clockDay}</div>
         </div>
-        <div className="timer-card"></div>
-        <FocusTimer />
+        <div className="timer-card">
+          <FocusTimer />
+        </div>
       </div>
 
       {/* Modals */}
