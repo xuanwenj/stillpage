@@ -1,7 +1,8 @@
 import { todoApi } from "../../api/client";
 import type { Todo } from "../../types";
 import { TodoItem } from "./TodoItem";
-import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
+import { DndContext, useDroppable } from "@dnd-kit/core";
+import { TodoItemWrapper } from "./TodoTools/TodoItemWrapper";
 
 interface TodoPanelProps {
   isLoading: boolean;
@@ -12,26 +13,7 @@ interface TodoPanelProps {
   onCreateTodayTodo: () => void;
   onCreateUpcomingTodo: () => void;
   onRefresh: () => void;
-}
-
-function DraggableTodo({
-  id,
-  children,
-}: {
-  id: string;
-  children: React.ReactNode;
-}) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined;
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
-    </div>
-  );
+  onDragged: (todoId: string) => void;
 }
 
 function DroppableArea({
@@ -54,6 +36,7 @@ export const TodoPanel = ({
   onCreateTodayTodo,
   onCreateUpcomingTodo,
   onRefresh,
+  onDragged,
 }: TodoPanelProps) => {
   const handleDragEnd = async (event: any) => {
     const { active, over } = event;
@@ -80,14 +63,18 @@ export const TodoPanel = ({
                 <h3 className="todo-section-label">Today</h3>
                 {todayTodos.length > 0 ? (
                   todayTodos.map((todo) => (
-                    <DraggableTodo key={todo.id} id={todo.id}>
-                      <TodoItem
-                        todo={todo}
-                        onCompleted={onTodoCompleted}
-                        onDelete={onTodoDeleted}
-                        showCheckbox={true}
-                      />
-                    </DraggableTodo>
+                    <TodoItemWrapper key={todo.id} todo={todo}>
+                      {(dragHandleProps) => (
+                        <TodoItem
+                          todo={todo}
+                          onCompleted={onTodoCompleted}
+                          onDelete={onTodoDeleted}
+                          showCheckbox={true}
+                          onDragged={onDragged}
+                          dragHandleProps={dragHandleProps}
+                        />
+                      )}
+                    </TodoItemWrapper>
                   ))
                 ) : (
                   <p className="panel-empty">No todos for today</p>
@@ -110,15 +97,18 @@ export const TodoPanel = ({
                   <p className="panel-empty">Nothing upcoming</p>
                 ) : (
                   upcomingTodos.map((todo) => (
-                    <DraggableTodo key={todo.id} id={todo.id}>
-                      <TodoItem
-                        key={todo.id}
-                        todo={todo}
-                        onCompleted={onTodoCompleted}
-                        onDelete={onTodoDeleted}
-                        showCheckbox={false}
-                      />
-                    </DraggableTodo>
+                    <TodoItemWrapper key={todo.id} todo={todo}>
+                      {(dragHandleProps) => (
+                        <TodoItem
+                          todo={todo}
+                          onCompleted={onTodoCompleted}
+                          onDelete={onTodoDeleted}
+                          showCheckbox={true}
+                          onDragged={onDragged}
+                          dragHandleProps={dragHandleProps}
+                        />
+                      )}
+                    </TodoItemWrapper>
                   ))
                 )}
                 {!isLoading && (

@@ -1,4 +1,4 @@
-import { CheckedIcon, UncheckedIcon } from "./TodoIcons";
+import { CheckedIcon, UncheckedIcon } from "./TodoTools/TodoIcons";
 import type { Todo } from "../../types";
 
 interface TodoItemProps {
@@ -6,6 +6,7 @@ interface TodoItemProps {
   onCompleted: (todoId: string) => void; //callback function
   onDelete: (todoId: string) => void;
   showCheckbox?: boolean;
+  dragHandleProps: any;
 }
 
 export const TodoItem = ({
@@ -13,6 +14,7 @@ export const TodoItem = ({
   onCompleted,
   onDelete,
   showCheckbox = true,
+  dragHandleProps,
 }: TodoItemProps) => {
   return (
     <div className="todo-item">
@@ -37,10 +39,16 @@ export const TodoItem = ({
           className="todo-delete-btn"
           onClick={() => {
             onDelete(todo.id);
-            console.log("Delete button clicked for todo:", todo.id);
           }}
         >
           ✕
+        </button>
+        <button
+          className="todo-drag-btn"
+          {...dragHandleProps.attributes}
+          {...dragHandleProps.listeners}
+        >
+          ≡
         </button>
       </div>
     </div>

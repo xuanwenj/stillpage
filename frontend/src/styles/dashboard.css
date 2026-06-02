@@ -533,6 +533,26 @@
   background-color: #fef2f2;
 }
 
+.todo-drag-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-hint);
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: grab;
+  transition: all 0.15s;
+  pointer-events: auto;
+}
+
+.todo-drag-btn:hover {
+  color: var(--accent);
+}
+
+.todo-drag-btn:active {
+  cursor: grabbing;
+}
+
 /* ===== RIGHT PANEL ===== */
 .right-panel {
   display: flex;
