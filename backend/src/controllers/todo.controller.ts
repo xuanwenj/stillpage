@@ -25,7 +25,7 @@ export const createTodo = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { noteId, content } = req.body;
+    const { noteId, content, status } = req.body;
     if (noteId) {
       const note = await Note.findById(noteId);
       if (!note) {
@@ -40,12 +40,16 @@ export const createTodo = async (
     if (!content || content.trim() === "") {
       return res.status(400).json({ message: "Content is required" });
     }
+    if (!status || (status !== "today" && status !== "upcoming")) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
 
     // Create todo
     const todo = new Todo({
       noteId,
       userId,
       content: content.trim(),
+      status,
     });
 
     await todo.save();
@@ -107,7 +111,7 @@ export const updateTodo = async (
     }
 
     const { id } = req.params;
-    const { content } = req.body;
+    const { content, status } = req.body;
 
     const todo = await Todo.findById(id);
     if (!todo) {
@@ -124,6 +128,13 @@ export const updateTodo = async (
         return res.status(400).json({ message: "Content cannot be empty" });
       }
       todo.content = content.trim();
+    }
+
+    if (status !== undefined) {
+      if (status !== "today" && status !== "upcoming") {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      todo.status = status;
     }
 
     await todo.save();

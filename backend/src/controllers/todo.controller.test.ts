@@ -7,11 +7,9 @@ import {
 } from "./todo.controller";
 import Todo from "../models/todo.model";
 import Note from "../models/note.model";
-import { DateTime } from "luxon";
 
 jest.mock("../models/todo.model");
 jest.mock("../models/note.model");
-jest.mock("luxon");
 
 interface AuthRequest extends Request {
   user?: {
@@ -54,7 +52,7 @@ describe("todo.controller", () => {
     });
 
     it("should return 404 if note does not exist", async () => {
-      req.body = { noteId: "note-123", content: "Test todo" };
+      req.body = { noteId: "note-123", content: "Test todo", status: "today" };
       (Note.findById as jest.Mock).mockResolvedValue(null);
 
       await createTodo(req as AuthRequest, res as Response, next);
@@ -65,7 +63,7 @@ describe("todo.controller", () => {
 
     it("should return 403 if note does not belong to user", async () => {
       const mockNote = { userId: "other-user" };
-      req.body = { noteId: "note-123", content: "Test todo" };
+      req.body = { noteId: "note-123", content: "Test todo", status: "today" };
       (Note.findById as jest.Mock).mockResolvedValue(mockNote);
 
       await createTodo(req as AuthRequest, res as Response, next);
@@ -77,7 +75,7 @@ describe("todo.controller", () => {
     });
 
     it("should return 400 if content is empty", async () => {
-      req.body = { content: "   " };
+      req.body = { content: "   ", status: "today" };
 
       await createTodo(req as AuthRequest, res as Response, next);
 
@@ -87,14 +85,25 @@ describe("todo.controller", () => {
       });
     });
 
+    it("should return 400 if status is invalid", async () => {
+      req.body = { content: "Test todo", status: "invalid" };
+
+      await createTodo(req as AuthRequest, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        message: "Invalid status",
+      });
+    });
+
     it("should create a todo and return 201", async () => {
       const mockTodo = {
         _id: "todo-123",
         content: "Test todo",
         userId: "user-123",
-        completed: false,
+        status: "today",
       };
-      req.body = { content: "Test todo" };
+      req.body = { content: "Test todo", status: "today" };
       (Todo as any).mockImplementation(() => ({
         save: jest.fn().mockResolvedValue(undefined),
         ...mockTodo,
@@ -114,7 +123,7 @@ describe("todo.controller", () => {
     });
 
     it("should handle errors during creation", async () => {
-      req.body = { content: "Test todo" };
+      req.body = { content: "Test todo", status: "today" };
       const mockTodo = {
         save: jest.fn().mockRejectedValue(new Error("Database error")),
       };
@@ -236,7 +245,7 @@ describe("todo.controller", () => {
       const mockTodo = {
         userId: "user-123",
         content: "Test",
-        completed: false,
+        status: "today",
       };
       req.params = { id: "todo-123" };
       req.body = { content: "   " };
@@ -250,10 +259,29 @@ describe("todo.controller", () => {
       });
     });
 
+    it("should return 400 if status is invalid", async () => {
+      const mockTodo = {
+        userId: "user-123",
+        content: "Test",
+        status: "today",
+      };
+      req.params = { id: "todo-123" };
+      req.body = { status: "invalid" };
+      (Todo.findById as jest.Mock).mockResolvedValue(mockTodo);
+
+      await updateTodo(req as AuthRequest, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        message: "Invalid status",
+      });
+    });
+
     it("should update todo content", async () => {
       const mockTodo = {
         userId: "user-123",
         content: "Old content",
+        status: "today",
         save: jest.fn().mockResolvedValue(undefined),
       };
       req.params = { id: "todo-123" };
@@ -268,6 +296,23 @@ describe("todo.controller", () => {
         message: "Todo item updated successfully",
         todo: mockTodo,
       });
+    });
+
+    it("should update todo status", async () => {
+      const mockTodo = {
+        userId: "user-123",
+        content: "Test",
+        status: "today",
+        save: jest.fn().mockResolvedValue(undefined),
+      };
+      req.params = { id: "todo-123" };
+      req.body = { status: "upcoming" };
+      (Todo.findById as jest.Mock).mockResolvedValue(mockTodo);
+
+      await updateTodo(req as AuthRequest, res as Response, next);
+
+      expect(mockTodo.status).toBe("upcoming");
+      expect(mockTodo.save).toHaveBeenCalled();
     });
   });
 
