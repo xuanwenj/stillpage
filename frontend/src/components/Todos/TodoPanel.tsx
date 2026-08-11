@@ -13,7 +13,6 @@ interface TodoPanelProps {
   onCreateTodayTodo: () => void;
   onCreateUpcomingTodo: () => void;
   onRefresh: () => void;
-  onDragged: (todoId: string) => void;
 }
 
 function DroppableArea({
@@ -36,7 +35,6 @@ export const TodoPanel = ({
   onCreateTodayTodo,
   onCreateUpcomingTodo,
   onRefresh,
-  onDragged,
 }: TodoPanelProps) => {
   const handleDragEnd = async (event: any) => {
     const { active, over } = event;
@@ -70,7 +68,6 @@ export const TodoPanel = ({
                           onCompleted={onTodoCompleted}
                           onDelete={onTodoDeleted}
                           showCheckbox={true}
-                          onDragged={onDragged}
                           dragHandleProps={dragHandleProps}
                         />
                       )}
@@ -104,7 +101,6 @@ export const TodoPanel = ({
                           onCompleted={onTodoCompleted}
                           onDelete={onTodoDeleted}
                           showCheckbox={true}
-                          onDragged={onDragged}
                           dragHandleProps={dragHandleProps}
                         />
                       )}
