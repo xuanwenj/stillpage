@@ -4,7 +4,6 @@ import {
   deleteTodo,
   updateTodo,
   getAllTodos,
-  getWeeklyStats,
 } from "./todo.controller";
 import Todo from "../models/todo.model";
 import Note from "../models/note.model";
@@ -110,7 +109,7 @@ describe("todo.controller", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           message: "Todo item created successfully",
-        })
+        }),
       );
     });
 
@@ -128,7 +127,7 @@ describe("todo.controller", () => {
         expect.objectContaining({
           message: "Error creating todo item",
           error: "Database error",
-        })
+        }),
       );
     });
   });
@@ -196,7 +195,7 @@ describe("todo.controller", () => {
         expect.objectContaining({
           message: "Error deleting todo item",
           error: "Delete error",
-        })
+        }),
       );
     });
   });
@@ -255,7 +254,6 @@ describe("todo.controller", () => {
       const mockTodo = {
         userId: "user-123",
         content: "Old content",
-        completed: false,
         save: jest.fn().mockResolvedValue(undefined),
       };
       req.params = { id: "todo-123" };
@@ -270,23 +268,6 @@ describe("todo.controller", () => {
         message: "Todo item updated successfully",
         todo: mockTodo,
       });
-    });
-
-    it("should update todo completed status", async () => {
-      const mockTodo = {
-        userId: "user-123",
-        content: "Test",
-        completed: false,
-        save: jest.fn().mockResolvedValue(undefined),
-      };
-      req.params = { id: "todo-123" };
-      req.body = { completed: true };
-      (Todo.findById as jest.Mock).mockResolvedValue(mockTodo);
-
-      await updateTodo(req as AuthRequest, res as Response, next);
-
-      expect(mockTodo.completed).toBe(true);
-      expect(mockTodo.save).toHaveBeenCalled();
     });
   });
 
@@ -331,84 +312,7 @@ describe("todo.controller", () => {
         expect.objectContaining({
           message: "Error fetching todos",
           error: "Fetch error",
-        })
-      );
-    });
-  });
-
-  describe("getWeeklyStats", () => {
-    it("should return 400 if timezone is not provided", async () => {
-      req.query = {};
-
-      await getWeeklyStats(req as AuthRequest, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        error: "Timezone is required",
-      });
-    });
-
-    it("should return 401 if user is not authenticated", async () => {
-      req.user = undefined;
-      req.query = { timezone: "America/New_York" };
-
-      await getWeeklyStats(req as AuthRequest, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ error: "User not authenticated" });
-    });
-
-    it("should return weekly stats with correct calculations", async () => {
-      const mockTodos = [
-        { completed: true },
-        { completed: true },
-        { completed: false },
-      ];
-      req.query = { timezone: "America/New_York" };
-
-      const mockDateTime = {
-        minus: jest.fn().mockReturnThis(),
-        startOf: jest.fn().mockReturnThis(),
-        plus: jest.fn().mockReturnThis(),
-        endOf: jest.fn().mockReturnThis(),
-        toUTC: jest.fn().mockReturnValue({
-          toJSDate: jest.fn().mockReturnValue(new Date()),
         }),
-        toString: jest.fn().mockReturnValue("2024-01-08T00:00:00"),
-        weekday: 1,
-      };
-
-      (DateTime.now as jest.Mock).mockReturnValue({
-        setZone: jest.fn().mockReturnValue(mockDateTime),
-      });
-
-      (Todo.find as jest.Mock).mockResolvedValue(mockTodos);
-
-      await getWeeklyStats(req as AuthRequest, res as Response, next);
-
-      expect(res.json).toHaveBeenCalledWith({
-        total: 3,
-        completed: 2,
-        rate: 67,
-        todos: mockTodos,
-      });
-    });
-
-    it("should handle errors during stats calculation", async () => {
-      req.query = { timezone: "America/New_York" };
-      const error = new Error("Calculation error");
-
-      (DateTime.now as jest.Mock).mockImplementation(() => {
-        throw error;
-      });
-
-      await getWeeklyStats(req as AuthRequest, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: "Server error",
-        })
       );
     });
   });

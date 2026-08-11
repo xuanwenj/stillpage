@@ -1,4 +1,3 @@
-import { DateTime } from "luxon";
 import { Request, Response, NextFunction } from "express";
 import Todo, { ITodo } from "../models/todo.model";
 import Note from "../models/note.model";
@@ -26,7 +25,7 @@ export const createTodo = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { noteId, content, status } = req.body;
+    const { noteId, content } = req.body;
     if (noteId) {
       const note = await Note.findById(noteId);
       if (!note) {
@@ -41,17 +40,12 @@ export const createTodo = async (
     if (!content || content.trim() === "") {
       return res.status(400).json({ message: "Content is required" });
     }
-    if (!status || (status !== "today" && status !== "upcoming")) {
-      return res.status(400).json({ message: "Invalid status" });
-    }
 
     // Create todo
     const todo = new Todo({
       noteId,
       userId,
       content: content.trim(),
-      status,
-      date: new Date().toISOString().slice(0, 10),
     });
 
     await todo.save();
@@ -113,7 +107,7 @@ export const updateTodo = async (
     }
 
     const { id } = req.params;
-    const { content, status } = req.body;
+    const { content } = req.body;
 
     const todo = await Todo.findById(id);
     if (!todo) {
@@ -132,13 +126,6 @@ export const updateTodo = async (
       todo.content = content.trim();
     }
 
-    if (status !== undefined) {
-      if (status !== "today" && status !== "upcoming") {
-        return res.status(400).json({ message: "Invalid status" });
-      }
-      todo.status = status;
-    }
-
     await todo.save();
 
     res.json({
@@ -154,7 +141,7 @@ export const updateTodo = async (
 };
 
 /**
- * Get all todos for the user (active todos only)
+ * Get all todos for the user
  * GET /api/todos
  */
 export const getAllTodos = async (
@@ -168,16 +155,7 @@ export const getAllTodos = async (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const timezone = (req.query.timezone as string) || "UTC";
-    const today = DateTime.now().setZone(timezone).toISODate()!;
-
-    // Promote past-pending todos (incomplete, date < today) to today
-    await Todo.updateMany(
-      { userId, archived: false, completed: false, date: { $lt: today } },
-      { $set: { date: today } },
-    );
-
-    const todos = await Todo.find({ userId, archived: false }).sort({
+    const todos = await Todo.find({ userId }).sort({
       createdAt: -1,
     });
 
