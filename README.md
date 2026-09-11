@@ -1,4 +1,6 @@
 # stillpage
+Watch a walkthrough of the app in action:
+<img width="1196" height="395" alt="image" src="https://github.com/user-attachments/assets/06184429-bfcb-46d2-93f4-72338f2b2944" />
 
 A calm, all-in-one space for your daily todos, notes, and braindumps — organized into folders so scattered thoughts have somewhere to land.
 
