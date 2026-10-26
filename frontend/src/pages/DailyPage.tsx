@@ -114,11 +114,12 @@ export const DailyPage = () => {
     if (!todo) return;
     const newCompleted = !todo.completed;
     await todoApi.updateTodo(todoId, undefined, newCompleted);
-    setCurrentTodos((prev) =>
+    const markCompleted = (prev: Todo[]) =>
       prev.map((t) =>
         t.id === todoId ? { ...t, completed: newCompleted } : t,
-      ),
-    );
+      );
+    setCurrentTodos(markCompleted);
+    setUpcomingTodos(markCompleted);
   };
 
   const handleBrainDumpBlur = async () => {
