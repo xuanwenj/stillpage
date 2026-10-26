@@ -119,6 +119,11 @@ export const DailyPage = () => {
         t.id === todoId ? { ...t, completed: newCompleted } : t,
       ),
     );
+    setUpcomingTodos((prev) =>
+      prev.map((t) =>
+        t.id === todoId ? { ...t, completed: newCompleted } : t,
+      ),
+    );
   };
 
   const handleBrainDumpBlur = async () => {

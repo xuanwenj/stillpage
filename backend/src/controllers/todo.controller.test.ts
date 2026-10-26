@@ -250,6 +250,25 @@ describe("todo.controller", () => {
       });
     });
 
+    it("should update todo completion and status", async () => {
+      const mockTodo = {
+        userId: "user-123",
+        content: "Test",
+        completed: false,
+        status: "today",
+        save: jest.fn().mockResolvedValue(undefined),
+      };
+      req.params = { id: "todo-123" };
+      req.body = { completed: true, status: "upcoming" };
+      (Todo.findById as jest.Mock).mockResolvedValue(mockTodo);
+
+      await updateTodo(req as AuthRequest, res as Response, next);
+
+      expect(mockTodo.completed).toBe(true);
+      expect(mockTodo.status).toBe("upcoming");
+      expect(mockTodo.save).toHaveBeenCalled();
+    });
+
     it("should update todo content", async () => {
       const mockTodo = {
         userId: "user-123",
